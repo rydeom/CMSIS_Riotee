@@ -5,7 +5,7 @@ The Makefile-based project optionally supports Visual Studio Code.
 
 ## Usage
 
-Follow the instructions to install the [Riotee SDK](https://github.com/NessieCircuits/Riotee_Runtime) and its dependencies to a location on your computer.
+Follow the instructions to install the [Riotee SDK](https://github.com/NessieCircuits/Riotee_Runtime) and its dependencies.
 
 If you want to develop your application in a GitHub repository, make sure you're signed in to GitHub and click on the green `Use this template` button on this repository's GitHub page to create your own repository from this template.
 Give your repository a name, for example, `my-riotee-app`.
@@ -15,7 +15,7 @@ Clone your new repository using its URL.
 git clone git@github.com:yourusername/my-riotee-app.git
 ```
 
-If you're not using GitHub, you can download this template by clicking on `Code->Download Zip` on the repository's GitHub page and extracting the downloaded file to a location on your computer.
+If you're not using GitHub, download this template by clicking on `Code->Download Zip` on the repository's GitHub page and extract the downloaded file to a location on your computer.
 
 ### Command-line
 
@@ -50,8 +50,6 @@ Adjust the three configuration keys in [.vscode/settings.json](.vscode/settings.
 
 Restart Visual Studio Code.
 Open `main.c` and check that code-completion works and that all imports are correctly resolved. For example, selecting `riotee_wait_cap_charged()` and pressing `F12` should take you straight into the SDK's code.
-
-If you installed the `riotee-probe` Python package into a virtual environment when setting up the SDK, press `Ctrl`+`Shift`+`p`, search for `Python: Select Interpreter`, and point it to the Python executable of your virtual environment.
 
 To install keyboard shortcuts, press `Ctrl`+`Shift`+`p`, type `Open Keyboard Shortcuts (JSON)` and press `Enter`, insert the following keybindings and save the file:
 
