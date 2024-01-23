@@ -5,7 +5,7 @@ The Makefile-based project optionally supports Visual Studio Code.
 
 ## Usage
 
-Follow the instructions to install the [Riotee SDK](https://github.com/NessieCircuits/Riotee_Runtime) and its dependencies.
+Follow the instructions to install the [Riotee SDK](https://github.com/NessieCircuits/Riotee_SDK) and its dependencies.
 
 If you want to develop your application in a GitHub repository, make sure you're signed in to GitHub and click on the green `Use this template` button on this repository's GitHub page to create your own repository from this template.
 Give your repository a name, for example, `my-riotee-app`.
