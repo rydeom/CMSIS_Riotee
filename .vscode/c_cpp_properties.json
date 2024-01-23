@@ -3,13 +3,13 @@
         {
             "name": "${config:operSys}",
             "includePath": [
-                "${config:sdkRoot}/core/include",
-                "${config:sdkRoot}/drivers/include",
-                "${config:sdkRoot}/external/nrfx",
-                "${config:sdkRoot}/external/nrfx/hal",
-                "${config:sdkRoot}/external/nrfx/mdk",
-                "${config:sdkRoot}/external/nrfx/templates",
-                "${config:sdkRoot}/external/CMSIS_5/CMSIS/Core/Include"
+                "${config:rioteeSdkRoot}/core/include",
+                "${config:rioteeSdkRoot}/drivers/include",
+                "${config:rioteeSdkRoot}/external/nrfx",
+                "${config:rioteeSdkRoot}/external/nrfx/hal",
+                "${config:rioteeSdkRoot}/external/nrfx/mdk",
+                "${config:rioteeSdkRoot}/external/nrfx/templates",
+                "${config:rioteeSdkRoot}/external/CMSIS_5/CMSIS/Core/Include"
             ],
             "defines": [
                 "mcpu=cortex-m4",
