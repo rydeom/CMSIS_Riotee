@@ -424,7 +424,7 @@
                 "__ATOMIC_ACQ_REL=4",
                 "__ATOMIC_RELEASE=3"
             ],
-            "compilerPath": "${config:gnuInstallRoot}/arm-none-eabi-gcc",
+            "compilerPath": "${config:gnuInstallRoot}arm-none-eabi-gcc",
             "intelliSenseMode": "gcc-arm",
             "cStandard": "c17",
             "cppStandard": "c++14"
