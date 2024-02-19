@@ -119,3 +119,16 @@ func printBufferPointerH(buffers []modelparser.Buffer) string {
 
 	return h_code
 }
+
+func getBufferData(buffers []modelparser.Buffer) string {
+	c_code := ""
+
+	c_code += "uint8_t *get_buffer_data(Buffers *buffers, int index){\n"
+	c_code += "    return &((Buffer_0 *)get_buffer(buffers, index))->data;\n"
+
+	c_code += "}\n"
+	c_code += "\n"
+
+	return c_code
+
+}

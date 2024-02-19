@@ -5,8 +5,7 @@
 #include <stdint.h>
 #include "tensor.h"
 
-typedef enum
-{
+typedef enum {
     ADD,
     AVERAGE_POOL_2D,
     CONCATENATION,
@@ -19,8 +18,7 @@ typedef enum
     FULLY_CONNECTED,
 } BuiltinOperator;
 
-typedef enum
-{
+typedef enum {
     NONE = 0,
     RELU = 1,
     RELU_N1_TO_1 = 2,
@@ -29,31 +27,27 @@ typedef enum
     SIGN_BIT = 5,
 } ActivationFunctionType;
 
-typedef enum
-{
+typedef enum {
     PADDING_SAME = 0,
     PADDING_VALID = 1,
 } Padding;
 
-typedef enum
-{
+typedef enum {
     DEFAULT = 0,
     SHUFFLED4x16INT8 = 1,
 } FullyConnectedOptionsWeightsFormat;
 
-typedef struct
-{
-    ActivationFunctionType fused_activation_function;
-    TensorType quantized_bias_type;
-    FullyConnectedOptionsWeightsFormat weights_format;
+typedef struct {
+     ActivationFunctionType fused_activation_function;
+     TensorType quantized_bias_type;
+     FullyConnectedOptionsWeightsFormat weights_format;
     char pad[1];
 } __attribute__((__packed__)) FullyConnectedOptions;
 
-typedef struct
-{
-    Padding padding;
-    ActivationFunctionType fused_activation_function;
-    TensorType quantized_bias_type;
+typedef struct {
+     Padding padding;
+     ActivationFunctionType fused_activation_function;
+     TensorType quantized_bias_type;
     char pad[1];
     int32_t stride_w;
     int32_t stride_h;
@@ -61,10 +55,9 @@ typedef struct
     int32_t dilation_h_factor;
 } __attribute__((__packed__)) Conv2DOptions;
 
-typedef struct
-{
-    Padding padding;
-    ActivationFunctionType fused_activation_function;
+typedef struct {
+     Padding padding;
+     ActivationFunctionType fused_activation_function;
     char pad[2];
     int32_t stride_w;
     int32_t stride_h;
@@ -73,8 +66,7 @@ typedef struct
     int32_t dilation_h_factor;
 } __attribute__((__packed__)) DepthwiseConv2DOptions;
 
-typedef struct
-{
+typedef struct {
     int32_t inputs[3];
     int32_t outputs[1];
     BuiltinOperator opcode;
@@ -82,8 +74,7 @@ typedef struct
     FullyConnectedOptions builtin_options;
 } __attribute__((__packed__)) Operator_0;
 
-typedef struct
-{
+typedef struct {
     int32_t inputs[3];
     int32_t outputs[1];
     BuiltinOperator opcode;
@@ -91,8 +82,7 @@ typedef struct
     FullyConnectedOptions builtin_options;
 } __attribute__((__packed__)) Operator_1;
 
-typedef struct
-{
+typedef struct {
     int32_t inputs[3];
     int32_t outputs[1];
     BuiltinOperator opcode;
@@ -100,8 +90,7 @@ typedef struct
     FullyConnectedOptions builtin_options;
 } __attribute__((__packed__)) Operator_2;
 
-typedef struct
-{
+typedef struct {
     Operator_0 operator_0;
     Operator_1 operator_1;
     Operator_2 operator_2;

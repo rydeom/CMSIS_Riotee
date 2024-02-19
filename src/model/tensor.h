@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "arm_nn_types.h"
 
-typedef enum
-{
+typedef enum {
     FLOAT32,
     FLOAT16,
     INT32,
@@ -26,14 +26,12 @@ typedef enum
     INT4,
 } TensorType;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_0;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -41,14 +39,12 @@ typedef struct
     QuantizationParameters_0 quantization;
 } __attribute__((__packed__)) Tensor_0;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_1;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[1];
@@ -56,14 +52,12 @@ typedef struct
     QuantizationParameters_1 quantization;
 } __attribute__((__packed__)) Tensor_1;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_2;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -71,14 +65,12 @@ typedef struct
     QuantizationParameters_2 quantization;
 } __attribute__((__packed__)) Tensor_2;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_3;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[1];
@@ -86,14 +78,12 @@ typedef struct
     QuantizationParameters_3 quantization;
 } __attribute__((__packed__)) Tensor_3;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_4;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -101,14 +91,12 @@ typedef struct
     QuantizationParameters_4 quantization;
 } __attribute__((__packed__)) Tensor_4;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_5;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[1];
@@ -116,14 +104,12 @@ typedef struct
     QuantizationParameters_5 quantization;
 } __attribute__((__packed__)) Tensor_5;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_6;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -131,14 +117,12 @@ typedef struct
     QuantizationParameters_6 quantization;
 } __attribute__((__packed__)) Tensor_6;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_7;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -146,14 +130,12 @@ typedef struct
     QuantizationParameters_7 quantization;
 } __attribute__((__packed__)) Tensor_7;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_8;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -161,14 +143,12 @@ typedef struct
     QuantizationParameters_8 quantization;
 } __attribute__((__packed__)) Tensor_8;
 
-typedef struct
-{
+typedef struct {
     float scale[1];
     int64_t zero_point[1];
 } __attribute__((__packed__)) QuantizationParameters_9;
 
-typedef struct
-{
+typedef struct {
     TensorType type;
     char pad[3];
     int32_t shape[2];
@@ -176,8 +156,7 @@ typedef struct
     QuantizationParameters_9 quantization;
 } __attribute__((__packed__)) Tensor_9;
 
-typedef struct
-{
+typedef struct {
     Tensor_0 tensor_0;
     Tensor_1 tensor_1;
     Tensor_2 tensor_2;
@@ -193,5 +172,27 @@ typedef struct
 uint8_t *get_tensor(Tensors *tensors, int index);
 
 void print_tensor_pointer(Tensors *tensors);
+
+void get_tensor_size_0(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_1(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_2(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_3(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_4(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_5(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_6(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_7(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_8(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size_9(Tensors *tensors, cmsis_nn_dims *dims);
+
+void get_tensor_size(Tensors *tensors, cmsis_nn_dims *dims, int index);
 
 #endif // TENSOR_H

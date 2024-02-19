@@ -12,6 +12,8 @@
 #include "model/model.h"
 #include "operator.h"
 
+#include "run_model.h"
+
 #define PIN_MICROPHONE_DISABLE PIN_D5
 
 void startup_callback(void)
@@ -52,6 +54,8 @@ int16_t samples[1000];
 
 int main(void)
 {
+    run_model(0.0f);
+
     int rc;
 
     for (;;)

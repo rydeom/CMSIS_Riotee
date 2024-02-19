@@ -1,4 +1,5 @@
 #include "operator.h"
+#include "utils.h"
 #include <limits.h>
 #include <math.h>
 #include <stdbool.h>
@@ -53,7 +54,7 @@ int CalculateActivationRangeQuantizedImpl(ActivationFunctionType activation, int
         {
             return -1;
         }
-        *act_min = max(qmin, tmp_q);
+        *act_min = fmax(qmin, tmp_q);
         *act_max = qmax;
     }
     else if (activation == 3)
@@ -63,13 +64,13 @@ int CalculateActivationRangeQuantizedImpl(ActivationFunctionType activation, int
         {
             return -1;
         }
-        *act_min = max(qmin, tmp_q);
+        *act_min = fmax(qmin, tmp_q);
         ret = Quantize(scale, zero_point, 6.0, &tmp_q);
         if (ret != 0)
         {
             return -1;
         }
-        *act_max = min(qmax, tmp_q);
+        *act_max = fmin(qmax, tmp_q);
     }
     else if (activation == 2)
     {
@@ -78,13 +79,13 @@ int CalculateActivationRangeQuantizedImpl(ActivationFunctionType activation, int
         {
             return -1;
         }
-        *act_min = max(qmin, tmp_q);
+        *act_min = fmax(qmin, tmp_q);
         ret = Quantize(scale, zero_point, 1.0, &tmp_q);
         if (ret != 0)
         {
             return -1;
         }
-        *act_max = min(qmax, tmp_q);
+        *act_max = fmin(qmax, tmp_q);
     }
     else
     {

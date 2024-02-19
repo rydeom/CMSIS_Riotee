@@ -2,18 +2,23 @@ package modelencoder
 
 import (
 	"fmt"
+	"tflite-compile/model-encoder/tensor"
 	modelparser "tflite-compile/model-parser"
 )
 
 func EncodeTensors(tensors []modelparser.Tensor) (string, string) {
+	c_get_tensor_size, h_get_tensor_size := tensor.GetTensorSize(tensors)
+
 	c_code := ""
 	c_code += "#include <stdio.h>\n"
 	c_code += "#include <stdint.h>\n"
 	c_code += "#include \"tensor.h\"\n"
 	c_code += "#include \"printf.h\"\n"
+	c_code += "#include \"arm_nn_types.h\"\n"
 	c_code += "\n"
 	c_code += getTensorFunc(tensors)
 	c_code += printTensorPointer(tensors)
+	c_code += c_get_tensor_size
 
 	h_code := ""
 	h_code += "#ifndef TENSOR_H\n"
@@ -22,6 +27,7 @@ func EncodeTensors(tensors []modelparser.Tensor) (string, string) {
 
 	h_code += "#include <stdio.h>\n"
 	h_code += "#include <stdint.h>\n"
+	h_code += "#include \"arm_nn_types.h\"\n"
 	h_code += "\n"
 
 	h_code += tensorTypeToEnum()
@@ -31,6 +37,7 @@ func EncodeTensors(tensors []modelparser.Tensor) (string, string) {
 	h_code += tensorsToStruct(tensors)
 	h_code += getTensorFuncH(tensors)
 	h_code += printTensorPointerH(tensors)
+	h_code += h_get_tensor_size
 	h_code += "#endif // TENSOR_H\n"
 
 	return c_code, h_code
@@ -90,7 +97,7 @@ func tensorToStruct(tensor *modelparser.Tensor, index int) string {
 		h_code += quantizationParametersToStruct(&tensor.Quantization, index)
 	}
 	h_code += "typedef struct {\n"
-	h_code += "     TensorType type;\n"
+	h_code += "    TensorType type;\n"
 	h_code += "    char pad[3];\n"
 	h_code += fmt.Sprintf("    int32_t shape[%d];\n", len(tensor.Shape))
 	h_code += "    uint32_t buffer;\n"
