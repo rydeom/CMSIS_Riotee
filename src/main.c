@@ -13,6 +13,7 @@
 #include "operator.h"
 
 #include "run_model.h"
+#include <math.h>
 
 #define PIN_MICROPHONE_DISABLE PIN_D5
 
@@ -54,12 +55,16 @@ int16_t samples[1000];
 
 int main(void)
 {
-    run_model(0.0f);
-
+    run_model(0.77f);
     int rc;
+    int cool = 0;
+    cool = 1;
+    cool = cool + 1;
+    cool = cool * 2;
 
     for (;;)
     {
+        // printf("Starting up\r\n");
 
         continue;
         // riotee_wait_cap_charged();

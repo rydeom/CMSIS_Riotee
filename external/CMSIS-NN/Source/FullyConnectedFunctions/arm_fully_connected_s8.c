@@ -71,7 +71,7 @@ arm_cmsis_nn_status arm_fully_connected_s8(const cmsis_nn_context *ctx,
     }
 #endif
 
-    const int32_t *kernel_sum = (const int32_t *) ctx->buf;
+    const int32_t *kernel_sum = (const int32_t *)ctx->buf;
 
     while (batch_cnt)
     {

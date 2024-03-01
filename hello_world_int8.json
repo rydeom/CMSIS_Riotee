@@ -1,0 +1,205 @@
+{
+  version: 3,
+  subgraphs: [
+    {
+      tensors: [
+        {
+          shape: [
+            1,
+            1
+          ],
+          type: "INT8",
+          buffer: 1,
+          name: "serving_default_dense_input:0",
+          quantization: {
+            scale: [
+              0.02448
+            ],
+            zero_point: [
+              -128
+            ]
+          },
+          shape_signature: [
+            -1,
+            1
+          ],
+          has_rank: true
+        },
+        {
+          shape: [
+            16
+          ],
+          type: "INT32",
+          buffer: 6,
+          name: "sequential/dense/BiasAdd/ReadVariableOp",
+          quantization: {
+            scale: [
+              0.000099
+            ],
+            zero_point: [
+              0
+            ]
+          },
+          has_rank: true
+        },
+        {
+          shape: [
+            16,
+            1
+          ],
+          type: "INT8",
+          buffer: 7,
+          name: "sequential/dense/MatMul",
+          quantization: {
+            scale: [
+              0.004039
+            ],
+            zero_point: [
+              0
+            ]
+          },
+          has_rank: true
+        },
+        {
+          shape: [
+            1,
+            16
+          ],
+          type: "INT8",
+          buffer: 8,
+          name: "sequential/dense/MatMul;sequential/dense/Relu;sequential/dense/BiasAdd",
+          quantization: {
+            scale: [
+              0.013325
+            ],
+            zero_point: [
+              -128
+            ]
+          },
+          shape_signature: [
+            -1,
+            16
+          ],
+          has_rank: true
+        }
+      ],
+      inputs: [
+        0
+      ],
+      outputs: [
+        9
+      ],
+      operators: [
+        {
+          inputs: [
+            0,
+            6,
+            5
+          ],
+          outputs: [
+            7
+          ],
+          builtin_options_type: "FullyConnectedOptions",
+          builtin_options: {
+            fused_activation_function: "RELU"
+          }
+        }
+      ],
+      name: "main"
+    }
+  ],
+  buffers: [
+    {
+    },
+    {
+      data: [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        194,
+        234,
+        255,
+        255,
+        117,
+        234,
+        255,
+        255,
+        184,
+        250,
+        255,
+        255,
+        36,
+        250,
+        255,
+        255,
+        200,
+        239,
+        255,
+        255,
+        172,
+        255,
+        255,
+        255,
+        68,
+        13,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        189,
+        7,
+        0,
+        0,
+        51,
+        234,
+        255,
+        255,
+        0,
+        0,
+        0,
+        0,
+        204,
+        228,
+        255,
+        255,
+        79,
+        13,
+        0,
+        0,
+        207,
+        227,
+        255,
+        255
+      ]
+    },
+    {
+      data: [
+        247,
+        202,
+        57,
+        71,
+        104,
+        115,
+        98,
+        99,
+        64,
+        230,
+        127,
+        25,
+        174,
+        68,
+        95,
+        86
+      ]
+    },
+    {
+    }
+  ]
+}

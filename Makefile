@@ -5,7 +5,7 @@ PRJ_ROOT := .
 OUTPUT_DIR := _build
 
 # Size of the user stack in bytes. Must be multiple of 4.
-RIOTEE_STACK_SIZE:= 1024
+RIOTEE_STACK_SIZE:= 2048
 # Size of retained memory in bytes including STACK_SIZE.
 RIOTEE_RAM_RETAINED_SIZE:= 8192
 
@@ -17,14 +17,21 @@ endif
 SRC_FILES = \
   $(PRJ_ROOT)/src/main.c \
   $(PRJ_ROOT)/src/run_model.c \
-  $(PRJ_ROOT)/src/utils.c \
   $(PRJ_ROOT)/src/model/buffer.c \
   $(PRJ_ROOT)/src/model/model.c \
   $(PRJ_ROOT)/src/model/operator.c \
-  $(PRJ_ROOT)/src/model/tensor.c
+  $(PRJ_ROOT)/src/model/tensor.c \
+  $(PRJ_ROOT)/src/model/fully_connected_utils.c \
+  $(PRJ_ROOT)/src/model/utils.c 
 
 INC_DIRS = \
   $(PRJ_ROOT)/include \
-  $(PRJ_ROOT)/src/model
+  $(PRJ_ROOT)/src/model \
+  $(PRJ_ROOT)/external/CMSIS-DSP/Include \
+  $(PRJ_ROOT)/external/CMSIS-NN/Include
+
+LIB_DIRS = \
+  $(PRJ_ROOT)
+LIB_FILES += -lcmsis-nn -lcmsisdsp
 
 include $(RIOTEE_SDK_ROOT)/Makefile

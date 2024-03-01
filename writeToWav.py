@@ -14,6 +14,6 @@ with open('screenlog.0', 'rb') as f:
                 binary_str = f.read(2000)
                 data.extend(list(struct.unpack('<1000h', binary_str)))
                 # data.append(struct.unpack('<360h', binary_str))
-    print(len(data))
+    print(data)
     samplerate = 8000
     write("example.wav", samplerate, np.asarray(data, dtype=np.int16))

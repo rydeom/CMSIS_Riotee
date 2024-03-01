@@ -104,7 +104,7 @@ func tensorToStruct(tensor *modelparser.Tensor, index int) string {
 	if tensor.Quantization.Quantized_dimension != 0 || len(tensor.Quantization.Scale) > 0 || len(tensor.Quantization.Zero_point) > 0 {
 		h_code += fmt.Sprintf("    QuantizationParameters_%d quantization;\n", index)
 	}
-	h_code += fmt.Sprintf("} __attribute__((__packed__)) Tensor_%d;\n", index)
+	h_code += fmt.Sprintf("} Tensor_%d;\n", index)
 	h_code += "\n"
 
 	return h_code

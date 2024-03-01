@@ -87,7 +87,18 @@
         "math.h": "c",
         "stdbool.h": "c",
         "arm_nn_types.h": "c",
-        "run_model.h": "c"
+        "run_model.h": "c",
+        "test_data.h": "c",
+        "config_data.h": "c",
+        "biases_data.h": "c",
+        "input_data.h": "c",
+        "output_ref_data.h": "c",
+        "weights_data.h": "c",
+        "riotee.h": "c",
+        "tensor.h": "c",
+        "fully_connected_utils.h": "c",
+        "cmsis_compiler.h": "c"
     },
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "cortex-debug.variableUseNaturalFormat": true
 }

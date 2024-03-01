@@ -47,24 +47,16 @@ func getTensorSizeToCMSISFunc(tensor modelparser.Tensor, index int) string {
 	c_code := ""
 
 	c_code += fmt.Sprintf("void get_tensor_size_%d(Tensors *tensors, cmsis_nn_dims *dims){\n", index)
-	if len(tensor.Shape) < 1 {
-		c_code += "    dims->n = 1;\n"
-	} else {
+	if len(tensor.Shape) >= 1 {
 		c_code += fmt.Sprintf("    dims->n = ((Tensor_%d *)get_tensor(tensors, %d))->shape[0];\n", index, index)
 	}
-	if len(tensor.Shape) < 2 {
-		c_code += "    dims->h = 1;\n"
-	} else {
+	if len(tensor.Shape) >= 2 {
 		c_code += fmt.Sprintf("    dims->h = ((Tensor_%d *)get_tensor(tensors, %d))->shape[1];\n", index, index)
 	}
-	if len(tensor.Shape) < 3 {
-		c_code += "    dims->w = 1;\n"
-	} else {
+	if len(tensor.Shape) >= 3 {
 		c_code += fmt.Sprintf("    dims->w = ((Tensor_%d *)get_tensor(tensors, %d))->shape[2];\n", index, index)
 	}
-	if len(tensor.Shape) < 4 {
-		c_code += "    dims->c = 1;\n"
-	} else {
+	if len(tensor.Shape) >= 4 {
 		c_code += fmt.Sprintf("    dims->c = ((Tensor_%d *)get_tensor(tensors, %d))->shape[3];\n", index, index)
 	}
 	c_code += "}\n"

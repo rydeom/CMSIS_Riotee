@@ -3,3 +3,5 @@ _build/
 flashing
 process-tflite
 schema
+external/cmsis-nn-build
+external/cmsis-dsp-build

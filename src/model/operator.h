@@ -38,16 +38,16 @@ typedef enum {
 } FullyConnectedOptionsWeightsFormat;
 
 typedef struct {
-     ActivationFunctionType fused_activation_function;
-     TensorType quantized_bias_type;
-     FullyConnectedOptionsWeightsFormat weights_format;
+    ActivationFunctionType fused_activation_function;
+    TensorType quantized_bias_type;
+    FullyConnectedOptionsWeightsFormat weights_format;
     char pad[1];
 } __attribute__((__packed__)) FullyConnectedOptions;
 
 typedef struct {
-     Padding padding;
-     ActivationFunctionType fused_activation_function;
-     TensorType quantized_bias_type;
+    Padding padding;
+    ActivationFunctionType fused_activation_function;
+    TensorType quantized_bias_type;
     char pad[1];
     int32_t stride_w;
     int32_t stride_h;
@@ -56,8 +56,8 @@ typedef struct {
 } __attribute__((__packed__)) Conv2DOptions;
 
 typedef struct {
-     Padding padding;
-     ActivationFunctionType fused_activation_function;
+    Padding padding;
+    ActivationFunctionType fused_activation_function;
     char pad[2];
     int32_t stride_w;
     int32_t stride_h;

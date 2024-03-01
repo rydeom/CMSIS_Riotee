@@ -12,6 +12,8 @@ func Endcode(m *modelparser.Model) error {
 	c_code_t, h_code_t := EncodeTensors(m.Tensors)
 	c_code_o, h_code_o := EncodeOperators(m.Operators)
 	c_code_m, h_code_m := endcodeModel(m)
+	c_code_u, h_code_u := EncodeUtils()
+	c_code_f, h_code_f := EncodeFullyConnectedUtils()
 
 	path := "/Users/janstiefel/code/Riotee_AppTemplate/src/model"
 
@@ -45,8 +47,27 @@ func Endcode(m *modelparser.Model) error {
 		return err
 	}
 	err = os.WriteFile(path+"/model.h", []byte(h_code_m), 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+"/utils.c", []byte(c_code_u), 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+"/utils.h", []byte(h_code_u), 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+"/fully_connected_utils.c", []byte(c_code_f), 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+"/fully_connected_utils.h", []byte(h_code_f), 0644)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func endcodeModel(m *modelparser.Model) (string, string) {
