@@ -11,9 +11,12 @@ func EncodeModelIntoBytes(model *modelparser.Model) []byte {
 	versionBytes := make([]byte, 4)
 	binary.LittleEndian.PutUint32(versionBytes, model.Version)
 	ret = append(ret, versionBytes...)
-	ret = append(ret, EncodeBuffersIntoBytes(model.Buffers)...)
-	ret = append(ret, EncodeTensorsIntoBytes(model.Tensors)...)
-	ret = append(ret, EncodeOperatorsIntoBytes(model.Operators)...)
+	tensorBytes := EncodeTensorsIntoBytes(model.Tensors, model.Buffers)
+	println("tensorBytes", len(tensorBytes))
+	ret = append(ret, tensorBytes...)
+	operatorBytes := EncodeOperatorsIntoBytes(model.Operators)
+	println("operatorBytes", len(operatorBytes))
+	ret = append(ret, operatorBytes...)
 
 	for _, input := range model.Inputs {
 		inputBytes := make([]byte, 4)

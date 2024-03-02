@@ -6,7 +6,7 @@ import (
 	modelparser "tflite-compile/model-parser"
 )
 
-func EncodeTensors(tensors []modelparser.Tensor) (string, string) {
+func EncodeTensors(tensors []modelparser.Tensor, buffers []modelparser.Buffer) (string, string) {
 	c_get_tensor_size, h_get_tensor_size := tensor.GetTensorSize(tensors)
 
 	c_code := ""
@@ -32,7 +32,7 @@ func EncodeTensors(tensors []modelparser.Tensor) (string, string) {
 
 	h_code += tensorTypeToEnum()
 	for i, tensor := range tensors {
-		h_code += tensorToStruct(&tensor, i)
+		h_code += tensorToStruct(&tensor, i, buffers)
 	}
 	h_code += tensorsToStruct(tensors)
 	h_code += getTensorFuncH(tensors)
@@ -90,7 +90,7 @@ func quantizationParametersToStruct(quantizationParameters *modelparser.Quantiza
 	return h_code
 }
 
-func tensorToStruct(tensor *modelparser.Tensor, index int) string {
+func tensorToStruct(tensor *modelparser.Tensor, index int, buffers []modelparser.Buffer) string {
 	h_code := ""
 
 	if tensor.Quantization.Quantized_dimension != 0 || len(tensor.Quantization.Scale) > 0 || len(tensor.Quantization.Zero_point) > 0 {
@@ -103,6 +103,10 @@ func tensorToStruct(tensor *modelparser.Tensor, index int) string {
 	h_code += "    uint32_t buffer;\n"
 	if tensor.Quantization.Quantized_dimension != 0 || len(tensor.Quantization.Scale) > 0 || len(tensor.Quantization.Zero_point) > 0 {
 		h_code += fmt.Sprintf("    QuantizationParameters_%d quantization;\n", index)
+	}
+	buffer := buffers[tensor.Buffer]
+	if len(buffer.Data) > 0 {
+		h_code += fmt.Sprintf("    unsigned char data[%d];\n", len(buffer.Data))
 	}
 	h_code += fmt.Sprintf("} Tensor_%d;\n", index)
 	h_code += "\n"

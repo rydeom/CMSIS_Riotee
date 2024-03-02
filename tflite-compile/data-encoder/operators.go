@@ -29,16 +29,16 @@ func encodeOperatorIntoBytes(operator modelparser.Operator) []byte {
 
 	ret = append(ret, byte(operator.Opcode))
 	ret = append(ret, byte(0), byte(0), byte(0)) // Padding
-	if operator.Builtin_options.Conv_2d != (modelparser.Conv2DOptions{}) {
+	if operator.Opcode == modelparser.BuiltinOperator_CONV_2D {
 		ret = append(ret, encodeConv2DOptions(operator.Builtin_options.Conv_2d)...)
 	}
-	if operator.Builtin_options.Depthwise_conv2d != (modelparser.DepthwiseConv2DOptions{}) {
+	if operator.Opcode == modelparser.BuiltinOperator_DEPTHWISE_CONV_2D {
 		ret = append(ret, encodeDepthwiseConv2DOptions(operator.Builtin_options.Depthwise_conv2d)...)
 	}
-	if operator.Builtin_options.Fully_connected != (modelparser.FullyConnectedOptions{}) {
+
+	if operator.Opcode == modelparser.BuiltinOperator_FULLY_CONNECTED {
 		ret = append(ret, encodeFullyConnectedOptions(operator.Builtin_options.Fully_connected)...)
 	}
-
 	return ret
 }
 

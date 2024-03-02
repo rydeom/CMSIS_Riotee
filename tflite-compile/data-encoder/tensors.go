@@ -7,16 +7,16 @@ import (
 	modelparser "tflite-compile/model-parser"
 )
 
-func EncodeTensorsIntoBytes(tensors []modelparser.Tensor) []byte {
+func EncodeTensorsIntoBytes(tensors []modelparser.Tensor, buffers []modelparser.Buffer) []byte {
 	ret := []byte{}
 	for _, tensor := range tensors {
-		ret = append(ret, encodeTensorIntoBytes(&tensor)...)
+		ret = append(ret, encodeTensorIntoBytes(&tensor, buffers)...)
 	}
 
 	return ret
 }
 
-func encodeTensorIntoBytes(tensor *modelparser.Tensor) []byte {
+func encodeTensorIntoBytes(tensor *modelparser.Tensor, buffers []modelparser.Buffer) []byte {
 	ret := []byte{}
 	ret = append(ret, byte(tensor.Type))
 	ret = append(ret, byte(0), byte(0), byte(0)) // Padding
@@ -32,6 +32,8 @@ func encodeTensorIntoBytes(tensor *modelparser.Tensor) []byte {
 	ret = append(ret, bufferBuffer...)
 
 	ret = append(ret, encodeQuantizationParamsIntoBytes(tensor.Quantization)...)
+	buffer := buffers[tensor.Buffer]
+	ret = append(ret, buffer.Data...)
 	if len(ret)%4 != 0 {
 		fmt.Println("Warning: buffer size is not a multiple of 4")
 	}

@@ -50,6 +50,7 @@ typedef struct {
     int32_t shape[1];
     uint32_t buffer;
     QuantizationParameters_1 quantization;
+    unsigned char data[4];
 } Tensor_1;
 
 typedef struct {
@@ -63,6 +64,7 @@ typedef struct {
     int32_t shape[2];
     uint32_t buffer;
     QuantizationParameters_2 quantization;
+    unsigned char data[16];
 } Tensor_2;
 
 typedef struct {
@@ -76,6 +78,7 @@ typedef struct {
     int32_t shape[1];
     uint32_t buffer;
     QuantizationParameters_3 quantization;
+    unsigned char data[64];
 } Tensor_3;
 
 typedef struct {
@@ -89,6 +92,7 @@ typedef struct {
     int32_t shape[2];
     uint32_t buffer;
     QuantizationParameters_4 quantization;
+    unsigned char data[256];
 } Tensor_4;
 
 typedef struct {
@@ -102,6 +106,7 @@ typedef struct {
     int32_t shape[1];
     uint32_t buffer;
     QuantizationParameters_5 quantization;
+    unsigned char data[64];
 } Tensor_5;
 
 typedef struct {
@@ -115,6 +120,7 @@ typedef struct {
     int32_t shape[2];
     uint32_t buffer;
     QuantizationParameters_6 quantization;
+    unsigned char data[16];
 } Tensor_6;
 
 typedef struct {

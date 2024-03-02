@@ -3,13 +3,11 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "buffer.h"
 #include "tensor.h"
 #include "operator.h"
 
 typedef struct {
     uint32_t version;
-    Buffers buffers;
     Tensors tensors;
     Operators operators;
     int32_t inputs[1];
