@@ -30,7 +30,7 @@
 
 #include "arm_nnfunctions.h"
 #include "arm_nnsupportfunctions.h"
-
+#include "debug_log.h"
 /**
  *  @ingroup Public
  */
@@ -75,6 +75,9 @@ arm_cmsis_nn_status arm_fully_connected_s8(const cmsis_nn_context *ctx,
 
     while (batch_cnt)
     {
+        DebugLog("B_batch_cnt: %d\n", batch_cnt);
+        DebugLog("B_input: %p\n", input);
+        DebugLog("B_output: %p\n", output);
         arm_nn_vec_mat_mult_t_s8(input,
                                  kernel,
                                  kernel_sum,
@@ -93,6 +96,9 @@ arm_cmsis_nn_status arm_fully_connected_s8(const cmsis_nn_context *ctx,
         input += filter_dims->n;
         output += output_dims->c;
         batch_cnt--;
+        DebugLog("A_batch_cnt: %d\n", batch_cnt);
+        DebugLog("A_input: %p\n", input);
+        DebugLog("A_output: %p\n", output);
     }
     return (ARM_CMSIS_NN_SUCCESS);
 }

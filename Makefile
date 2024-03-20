@@ -16,6 +16,7 @@ endif
 
 SRC_FILES = \
   $(PRJ_ROOT)/src/main.c \
+  $(PRJ_ROOT)/src/debug_log.c \
   $(PRJ_ROOT)/src/run_model.c \
   $(PRJ_ROOT)/src/model/model.c \
   $(PRJ_ROOT)/src/model/operator.c \
@@ -32,5 +33,9 @@ INC_DIRS = \
 LIB_DIRS = \
   $(PRJ_ROOT)
 LIB_FILES += -lcmsis-nn -lcmsisdsp
+
+USER_DEFINES = -DDISABLE_CAP_MONITOR
+USER_DEFINES += -DARM_MATH_DSP
+USER_DEFINES += -DTF_LITE_STATIC_MEMORY
 
 include $(RIOTEE_SDK_ROOT)/Makefile

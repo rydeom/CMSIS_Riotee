@@ -97,7 +97,10 @@
         "riotee.h": "c",
         "tensor.h": "c",
         "fully_connected_utils.h": "c",
-        "cmsis_compiler.h": "c"
+        "cmsis_compiler.h": "c",
+        "utils.h": "c",
+        "arm_nnsupportfunctions.h": "c",
+        "debug_log.h": "c"
     },
     "editor.formatOnSave": true,
     "cortex-debug.variableUseNaturalFormat": true

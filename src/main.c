@@ -36,11 +36,6 @@ void reset_callback(void)
 
     vm1010_cfg_t cfg = {.pin_vout = PIN_D2, .pin_vbias = PIN_D3, .pin_mode = PIN_D10, .pin_dout = PIN_D4};
     vm1010_init(&cfg);
-    // Model *model;
-    // model = ((Model *)model_data_raw);
-    // print_model_pointer(model);
-    // print_buffer_pointer(&model->buffers);
-    // print_tensor_pointer(&model->tensors);
 }
 
 /* This gets called when capacitor voltage gets low */
@@ -55,18 +50,23 @@ int16_t samples[1000];
 
 int main(void)
 {
+    uint64_t startTicks = 0;
+    uint64_t endTicks = 0;
+    printf("Starting up\r\n");
+    riotee_timing_now(&startTicks);
+    printf("Ticks: %llu\r\n", endTicks - startTicks);
     run_model(0.77f);
+    printf("Ticks: %llu\r\n", endTicks - startTicks);
+
+    riotee_timing_now(&endTicks);
+    printf("Ticks: %llu\r\n", endTicks - startTicks);
     int rc;
-    int cool = 0;
-    cool = 1;
-    cool = cool + 1;
-    cool = cool * 2;
 
     for (;;)
     {
         // printf("Starting up\r\n");
-
-        continue;
+        riotee_sleep_ms(1000);
+        // continue;
         // riotee_wait_cap_charged();
 
         /* Switch on microphone */

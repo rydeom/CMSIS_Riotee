@@ -177,8 +177,6 @@ typedef struct {
 
 uint8_t *get_tensor(Tensors *tensors, int index);
 
-void print_tensor_pointer(Tensors *tensors);
-
 void get_tensor_size_0(Tensors *tensors, cmsis_nn_dims *dims);
 
 void get_tensor_size_1(Tensors *tensors, cmsis_nn_dims *dims);

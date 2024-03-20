@@ -17,7 +17,7 @@ func EncodeTensors(tensors []modelparser.Tensor, buffers []modelparser.Buffer) (
 	c_code += "#include \"arm_nn_types.h\"\n"
 	c_code += "\n"
 	c_code += getTensorFunc(tensors)
-	c_code += printTensorPointer(tensors)
+	// c_code += printTensorPointer(tensors)
 	c_code += c_get_tensor_size
 
 	h_code := ""
@@ -36,7 +36,7 @@ func EncodeTensors(tensors []modelparser.Tensor, buffers []modelparser.Buffer) (
 	}
 	h_code += tensorsToStruct(tensors)
 	h_code += getTensorFuncH(tensors)
-	h_code += printTensorPointerH(tensors)
+	// h_code += printTensorPointerH(tensors)
 	h_code += h_get_tensor_size
 	h_code += "#endif // TENSOR_H\n"
 
