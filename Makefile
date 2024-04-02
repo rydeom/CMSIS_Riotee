@@ -16,7 +16,6 @@ endif
 
 SRC_FILES = \
   $(PRJ_ROOT)/src/main.c \
-  $(PRJ_ROOT)/src/debug_log.c \
   $(PRJ_ROOT)/src/run_model.c \
   $(PRJ_ROOT)/src/model/model.c \
   $(PRJ_ROOT)/src/model/operator.c \

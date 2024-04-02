@@ -54,12 +54,9 @@ int main(void)
     uint64_t endTicks = 0;
     printf("Starting up\r\n");
     riotee_timing_now(&startTicks);
-    printf("Ticks: %llu\r\n", endTicks - startTicks);
-    run_model(0.77f);
-    printf("Ticks: %llu\r\n", endTicks - startTicks);
-
+    run_model(0.8f);
     riotee_timing_now(&endTicks);
-    printf("Ticks: %llu\r\n", endTicks - startTicks);
+    printf("Ticks: %llu - %llu = %llu\r\n", endTicks, startTicks, endTicks - startTicks);
     int rc;
 
     for (;;)

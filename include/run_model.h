@@ -9,8 +9,8 @@ union LayersPuts
     int8_t layer_1_input[1];
     int8_t layer_1_output[16];
     int8_t layer_2_input[16];
-    int8_t layer_2_output[16];
-    int8_t layer_3_input[16];
+    int8_t layer_2_output[256];
+    int8_t layer_3_input[256];
     int8_t layer_3_output[1];
 };
 
