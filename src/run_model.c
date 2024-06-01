@@ -260,6 +260,12 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     SignalFilterbankLog(&signal_filter_bank_log_params);
     printf("Filter bank log done\n");
+
+    copyCastInt16ToInt32(
+        output_layer->layer_13_output,
+        output_layer->layer_13_output,
+        sizeof(output_layer->layer_13_output) / sizeof(output_layer->layer_13_output[0]));
+    printf("Copy done\n");
 }
 
 void print_bytes(void *ptr, int size)
