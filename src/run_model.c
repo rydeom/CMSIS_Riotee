@@ -11,6 +11,7 @@
 #include "signal_energy.h"
 #include "signal_filter_bank.h"
 #include "signal_bank_square_root.h"
+#include "signal_filter_bank_spectral_subtraction.h"
 #include "utils.h"
 #include "layer_data.h"
 #include "cast.h"
@@ -202,6 +203,30 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     SignalBankSquareRoot(&signal_bank_square_root_params);
     printf("Bank square root done\n");
+
+    AUDIO_PREPROCESSOR_Operator_11 *op11 = (AUDIO_PREPROCESSOR_Operator_11 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 11);
+
+    uint32_t noise_estimate[signal_bank_square_root_params.num_channels];
+
+    SpectralSubtractionConfig spectral_subtraction_config = {
+        .num_channels = op11->builtin_options.num_channels,
+        .smoothing = op11->builtin_options.smoothing,
+        .one_minus_smoothing = op11->builtin_options.one_minus_smoothing,
+        .min_signal_remaining = op11->builtin_options.min_signal_remaining,
+        .alternate_smoothing = op11->builtin_options.alternate_smoothing,
+        .alternate_one_minus_smoothing = op11->builtin_options.alternate_one_minus_smoothing,
+        .smoothing_bits = op11->builtin_options.smoothing_bits,
+        .spectral_subtraction_bits = op11->builtin_options.spectral_subtraction_bits,
+        .clamping = op11->builtin_options.clamping};
+
+    SignalFilterBankSpectralSubtractionParams signal_filter_bank_spectral_subtraction_params;
+    signal_filter_bank_spectral_subtraction_params.input = output_layer->layer_10_output;
+    signal_filter_bank_spectral_subtraction_params.output = output_layer->layer_11_output;
+    signal_filter_bank_spectral_subtraction_params.config = &spectral_subtraction_config;
+    signal_filter_bank_spectral_subtraction_params.noise_estimate = noise_estimate;
+    signal_filter_bank_spectral_subtraction_params.noise_estimate_size = sizeof(noise_estimate) / sizeof(noise_estimate[0]);
+
+    SignalFilterBankSpectralSubtraction(&signal_filter_bank_spectral_subtraction_params);
 }
 
 void print_bytes(void *ptr, int size)
