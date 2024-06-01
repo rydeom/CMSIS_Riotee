@@ -37,6 +37,7 @@ SRC_FILES = \
   $(PRJ_ROOT)/src/model/utils/signal/signal_bank_square_root.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_filter_bank_spectral_subtraction.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_pcan.c \
+  $(PRJ_ROOT)/src/model/utils/signal/signal_filter_bank_log.c \
 
 INC_DIRS = \
   $(PRJ_ROOT)/include \

@@ -13,6 +13,7 @@
 #include "signal_bank_square_root.h"
 #include "signal_filter_bank_spectral_subtraction.h"
 #include "signal_pcan.h"
+#include "signal_filter_bank_log.h"
 #include "utils.h"
 #include "layer_data.h"
 #include "cast.h"
@@ -246,6 +247,19 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     SignalPcan(&signal_pcan_params);
     printf("PCAN done\n");
+
+    AUDIO_PREPROCESSOR_Operator_13 *op13 = (AUDIO_PREPROCESSOR_Operator_13 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 13);
+    AUDIO_PREPROCESSOR_Tensor_34 *tensor34 = (AUDIO_PREPROCESSOR_Tensor_34 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 34);
+
+    SignalFilterBankLogParams signal_filter_bank_log_params;
+    signal_filter_bank_log_params.input = output_layer->layer_12_output;
+    signal_filter_bank_log_params.output = output_layer->layer_13_output;
+    signal_filter_bank_log_params.input_correction_bits = op13->builtin_options.input_correction_bits;
+    signal_filter_bank_log_params.output_scale = op13->builtin_options.output_scale;
+    signal_filter_bank_log_params.num_channels = tensor34->shape[0];
+
+    SignalFilterbankLog(&signal_filter_bank_log_params);
+    printf("Filter bank log done\n");
 }
 
 void print_bytes(void *ptr, int size)
