@@ -156,6 +156,14 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     concatenation_params.output_shape_size = sizeof(concatenation_params.output_shape) / sizeof(concatenation_params.output_shape[0]);
 
     RunConcatenation(&concatenation_params);
+
+    printf("Concatenation done\n");
+
+    copyCastInt32ToUint32(
+        output_layer->layer_7_output,
+        output_layer->layer_7_output,
+        sizeof(output_layer->layer_7_output) / sizeof(output_layer->layer_7_output[0]));
+    printf("Copy done\n");
 }
 
 void print_bytes(void *ptr, int size)
