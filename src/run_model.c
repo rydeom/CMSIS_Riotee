@@ -12,6 +12,7 @@
 #include "signal_filter_bank.h"
 #include "signal_bank_square_root.h"
 #include "signal_filter_bank_spectral_subtraction.h"
+#include "signal_pcan.h"
 #include "utils.h"
 #include "layer_data.h"
 #include "cast.h"
@@ -227,6 +228,24 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     signal_filter_bank_spectral_subtraction_params.noise_estimate_size = sizeof(noise_estimate) / sizeof(noise_estimate[0]);
 
     SignalFilterBankSpectralSubtraction(&signal_filter_bank_spectral_subtraction_params);
+    printf("Spectral subtraction done\n");
+
+    AUDIO_PREPROCESSOR_Operator_12 *op12 = (AUDIO_PREPROCESSOR_Operator_12 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 12);
+    AUDIO_PREPROCESSOR_Tensor_8 *tensor8 = (AUDIO_PREPROCESSOR_Tensor_8 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 8);
+    AUDIO_PREPROCESSOR_Tensor_33 *tensor33 = (AUDIO_PREPROCESSOR_Tensor_33 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 33);
+
+    SignalPcanParams signal_pcan_params;
+    signal_pcan_params.input = output_layer->layer_11_output;
+    signal_pcan_params.output = output_layer->layer_12_output;
+    signal_pcan_params.snr_shift = op12->builtin_options.snr_shift;
+    signal_pcan_params.noise_estimate = noise_estimate;
+    signal_pcan_params.noise_estimate_size = sizeof(noise_estimate) / sizeof(noise_estimate[0]);
+    signal_pcan_params.gain_lut = tensor8->data;
+    signal_pcan_params.gain_lut_size = sizeof(tensor8->data) / sizeof(tensor8->data[0]);
+    signal_pcan_params.num_channels = tensor33->shape[0];
+
+    SignalPcan(&signal_pcan_params);
+    printf("PCAN done\n");
 }
 
 void print_bytes(void *ptr, int size)

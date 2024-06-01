@@ -112,7 +112,8 @@
         "layer_data.h": "c",
         "signal_utils.h": "c",
         "signal_energy.h": "c",
-        "signal_filter_bank.h": "c"
+        "signal_filter_bank.h": "c",
+        "signal_pcan.h": "c"
     },
     "editor.formatOnSave": true,
     "cortex-debug.variableUseNaturalFormat": true
