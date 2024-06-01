@@ -32,6 +32,7 @@ SRC_FILES = \
   $(PRJ_ROOT)/src/model/utils/signal/signal_fft_auto_scale.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_rfft.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_energy.c \
+  $(PRJ_ROOT)/src/model/utils/signal/signal_filter_bank.c \
 
 INC_DIRS = \
   $(PRJ_ROOT)/include \

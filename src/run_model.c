@@ -9,6 +9,7 @@
 #include "signal_fft_auto_scale.h"
 #include "signal_rfft.h"
 #include "signal_energy.h"
+#include "signal_filter_bank.h"
 #include "utils.h"
 #include "layer_data.h"
 #include "cast.h"
@@ -164,6 +165,31 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         output_layer->layer_7_output,
         sizeof(output_layer->layer_7_output) / sizeof(output_layer->layer_7_output[0]));
     printf("Copy done\n");
+
+    AUDIO_PREPROCESSOR_Operator_9 *op9 = (AUDIO_PREPROCESSOR_Operator_9 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 9);
+    AUDIO_PREPROCESSOR_Tensor_13 *tensor13 = (AUDIO_PREPROCESSOR_Tensor_13 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 13);
+    AUDIO_PREPROCESSOR_Tensor_12 *tensor12 = (AUDIO_PREPROCESSOR_Tensor_12 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 12);
+    AUDIO_PREPROCESSOR_Tensor_11 *tensor11 = (AUDIO_PREPROCESSOR_Tensor_11 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 11);
+    AUDIO_PREPROCESSOR_Tensor_10 *tensor10 = (AUDIO_PREPROCESSOR_Tensor_10 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 10);
+    AUDIO_PREPROCESSOR_Tensor_9 *tensor9 = (AUDIO_PREPROCESSOR_Tensor_9 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 9);
+    AUDIO_PREPROCESSOR_Tensor_29 *tensor29 = (AUDIO_PREPROCESSOR_Tensor_29 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 29);
+
+    SignalFilterBankParams signal_filter_bank_params;
+    signal_filter_bank_params.config.num_channels = op9->builtin_options.num_channels;
+    uint64_t work_area[signal_filter_bank_params.config.num_channels + 1];
+    signal_filter_bank_params.work_area = work_area;
+    signal_filter_bank_params.config.weights = tensor13->data;
+    signal_filter_bank_params.config.unweights = tensor12->data;
+    signal_filter_bank_params.config.channel_frequency_starts = tensor11->data;
+    signal_filter_bank_params.config.channel_weight_starts = tensor10->data;
+    signal_filter_bank_params.config.channel_widths = tensor9->data;
+
+    FilterbankAccumulateChannels(
+        &signal_filter_bank_params,
+        output_layer->layer_7_output,
+        output_layer->layer_9_output,
+        tensor29->shape,
+        sizeof(tensor29->shape) / sizeof(tensor29->shape[0]));
 }
 
 void print_bytes(void *ptr, int size)

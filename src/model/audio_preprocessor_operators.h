@@ -79,6 +79,7 @@ typedef struct {
     int32_t outputs[1];
     BuiltinOperator opcode;
     char pad[2];
+    SignalFilterBankOptions builtin_options;
 } __attribute__((__packed__)) AUDIO_PREPROCESSOR_Operator_9;
 
 typedef struct {
@@ -86,7 +87,6 @@ typedef struct {
     int32_t outputs[1];
     BuiltinOperator opcode;
     char pad[2];
-    SignalFilterBankOptions builtin_options;
 } __attribute__((__packed__)) AUDIO_PREPROCESSOR_Operator_10;
 
 typedef struct {

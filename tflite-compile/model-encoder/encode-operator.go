@@ -103,7 +103,7 @@ func operatorToStruct(modelTag string, operator *modelparser.Operator, i int) st
 			h_code += "    SignalRfftOptions builtin_options;\n"
 		case modelparser.CustomOperator_SIGNAL_ENERGY:
 			h_code += "    SignalEnergyOptions builtin_options;\n"
-		case modelparser.CustomOperator_SIGNAL_FILTER_BANK_SQUARE_ROOT:
+		case modelparser.CustomOperator_SIGNAL_FILTER_BANK:
 			h_code += "    SignalFilterBankOptions builtin_options;\n"
 		case modelparser.CustomOperator_SIGNAL_FILTER_BANK_SPECTRAL_SUBTRACTION:
 			h_code += "    SignalFilterBankSpectralSubtractionOptions builtin_options;\n"
