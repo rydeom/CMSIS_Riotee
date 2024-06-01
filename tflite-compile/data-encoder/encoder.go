@@ -31,7 +31,7 @@ func EncodeModelIntoBytes(model *modelparser.Model) []byte {
 	}
 
 	if len(ret)%4 != 0 {
-		fmt.Println("Warning: buffer size is not a multiple of 4")
+		fmt.Println("Warning: final buffer size is not a multiple of 4")
 	}
 	return ret
 }

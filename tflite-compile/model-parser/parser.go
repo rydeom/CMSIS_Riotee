@@ -1,6 +1,9 @@
 package modelparser
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
 	tflite "tflite-compile/tflite"
 
 	flatbuffers "github.com/google/flatbuffers/go"
@@ -87,7 +90,6 @@ func (m *Model) parseOperators(tflite_model *tflite.Model, sub_graph tflite.SubG
 	for i := 0; i < sub_graph.OperatorsLength(); i++ {
 		tflite_operator := tflite.Operator{}
 		if sub_graph.Operators(&tflite_operator, i) {
-
 			operator := Operator{
 				Inputs:  make([]int, tflite_operator.InputsLength()),
 				Outputs: make([]int, tflite_operator.OutputsLength()),
@@ -102,7 +104,9 @@ func (m *Model) parseOperators(tflite_model *tflite.Model, sub_graph tflite.SubG
 			tflite_model_operator_code := tflite.OperatorCode{}
 			tflite_model.OperatorCodes(&tflite_model_operator_code, int(tflite_operator.OpcodeIndex()))
 			operator.Opcode = BuiltinOperator(tflite_model_operator_code.BuiltinCode())
-
+			if operator.Opcode == BuiltinOperator_CUSTOM {
+				operator.Custom_opcode = CustomOperator(tflite_model_operator_code.CustomCode())
+			}
 			parseOperatorOptions(&operator, tflite_operator)
 			operators[i] = operator
 		}
@@ -111,6 +115,10 @@ func (m *Model) parseOperators(tflite_model *tflite.Model, sub_graph tflite.SubG
 }
 
 func parseOperatorOptions(operator *Operator, tflite_operator tflite.Operator) {
+	if operator.Opcode == BuiltinOperator_CUSTOM {
+		parseCustomOperatorOptions(operator, tflite_operator)
+		return
+	}
 	switch operator.Opcode {
 	case BuiltinOperator_FULLY_CONNECTED:
 		table := flatbuffers.Table{}
@@ -120,6 +128,182 @@ func parseOperatorOptions(operator *Operator, tflite_operator tflite.Operator) {
 		operator.Builtin_options = BuiltinOptions{
 			Fully_connected: FullyConnectedOptions{
 				Fused_activation_function: ActivationFunctionType(options.FusedActivationFunction()),
+			},
+		}
+	case BuiltinOperator_STRIDED_SLICE:
+		table := flatbuffers.Table{}
+		tflite_operator.BuiltinOptions(&table)
+		options := tflite.StridedSliceOptions{}
+		options.Init(table.Bytes, table.Pos)
+		operator.Builtin_options = BuiltinOptions{
+			Strided_slice: StridedSliceOptions{
+				Begin_mask:       int16(options.BeginMask()),
+				End_mask:         int16(options.EndMask()),
+				Ellipsis_mask:    int16(options.EllipsisMask()),
+				New_axis_mask:    int16(options.NewAxisMask()),
+				Shrink_axis_mask: int16(options.ShrinkAxisMask()),
+				Offset:           options.Offset(),
+			},
+		}
+	case BuiltinOperator_CONCATENATION:
+		table := flatbuffers.Table{}
+		tflite_operator.BuiltinOptions(&table)
+		options := tflite.ConcatenationOptions{}
+		options.Init(table.Bytes, table.Pos)
+		operator.Builtin_options = BuiltinOptions{
+			Concatenation: ConcatenationOptions{
+				Axis:                      int8(options.Axis()),
+			},
+		}
+	}
+}
+
+func parseCustomOperatorOptions(operator *Operator, tflite_operator tflite.Operator) {
+	if tflite_operator.CustomOptionsLength() == 0 {
+		return
+	}
+
+	filePath := "tflite-files/custom_options.json" // Replace with the actual file path
+	fileData, err := os.ReadFile(filePath)
+	if err != nil {
+		// Handle error
+		return
+	}
+	var customOptions map[string]interface{}
+	err = json.Unmarshal(fileData, &customOptions)
+	if err != nil {
+		// Handle error
+		return
+	}
+	optionsMap, ok := customOptions[fmt.Sprintf("%d", tflite_operator.OpcodeIndex())].(map[string]interface{})
+	if !ok {
+		return
+	}
+
+	switch operator.Custom_opcode {
+	case CustomOperator_SIGNAL_WINDOW:
+		shift, ok := optionsMap["shift"].(float64)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_window: SignalWindowOptions{
+				Shift: (int32)(shift),
+			},
+		}
+	case CustomOperator_SIGNAL_RFFT:
+		tfliteType, ok := optionsMap["T"].(TFLiteType)
+		if !ok {
+			return
+		}
+		fftLength, ok := optionsMap["fft_length"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_rfft: SignalRfftOptions{
+				TFLite_type: tfliteType,
+				Fft_length:  fftLength,
+			},
+		}
+	case CustomOperator_SIGNAL_ENERGY:
+		endIndex, ok := optionsMap["end_index"].(int32)
+		if !ok {
+			return
+		}
+		startIndex, ok := optionsMap["start_index"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_energy: SignalEnergyOptions{
+				End_index:   endIndex,
+				Start_index: startIndex,
+			},
+		}
+	case CustomOperator_SIGNAL_FILTER_BANK:
+		numChannels, ok := optionsMap["num_channels"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_filter_bank: SignalFilterBankOptions{
+				Num_channels: numChannels,
+			},
+		}
+	case CustomOperator_SIGNAL_FILTER_BANK_SPECTRAL_SUBTRACTION:
+		alternateOneMinusSmoothing, ok := optionsMap["alternate_one_minus_smoothing"].(int32)
+		if !ok {
+			return
+		}
+		alternateSmoothing, ok := optionsMap["alternate_smoothing"].(int32)
+		if !ok {
+			return
+		}
+		clamping, ok := optionsMap["clamping"].(bool)
+		if !ok {
+			return
+		}
+		minSignalRemaining, ok := optionsMap["min_signal_remaining"].(int32)
+		if !ok {
+			return
+		}
+		numChannels, ok := optionsMap["num_channels"].(int32)
+		if !ok {
+			return
+		}
+		oneMinusSmoothing, ok := optionsMap["one_minus_smoothing"].(int32)
+		if !ok {
+			return
+		}
+		smoothing, ok := optionsMap["smoothing"].(int32)
+		if !ok {
+			return
+		}
+		smoothingBits, ok := optionsMap["smoothing_bits"].(int32)
+		if !ok {
+			return
+		}
+		spectralSubtractionBits, ok := optionsMap["spectral_subtraction_bits"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_filter_bank_spectral_subtraction: SignalFilterBankSpectralSubtractionOptions{
+				Alternate_one_minus_smoothing: alternateOneMinusSmoothing,
+				Alternate_smoothing:           alternateSmoothing,
+				Clamping:                      clamping,
+				Min_signal_remaining:          minSignalRemaining,
+				Num_channels:                  numChannels,
+				One_minus_smoothing:           oneMinusSmoothing,
+				Smoothing:                     smoothing,
+				Smoothing_bits:                smoothingBits,
+				Spectral_subtraction_bits:     spectralSubtractionBits,
+			},
+		}
+	case CustomOperator_SIGNAL_PCAN:
+		snrShift, ok := optionsMap["snr_shift"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_pcan: SignalPcanOptions{
+				Snr_shift: snrShift,
+			},
+		}
+	case CustomOperator_SIGNAL_FILTER_BANK_LOG:
+		inputCorrectionBits, ok := optionsMap["input_correction_bits"].(int32)
+		if !ok {
+			return
+		}
+		outputScale, ok := optionsMap["output_scale"].(int32)
+		if !ok {
+			return
+		}
+		operator.Builtin_options = BuiltinOptions{
+			Signal_filter_bank_log: SignalFilterBankLogOptions{
+				Input_correction_bits: inputCorrectionBits,
+				Output_scale:          outputScale,
 			},
 		}
 	}
