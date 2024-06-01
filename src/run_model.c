@@ -10,6 +10,7 @@
 #include "signal_rfft.h"
 #include "signal_energy.h"
 #include "signal_filter_bank.h"
+#include "signal_bank_square_root.h"
 #include "utils.h"
 #include "layer_data.h"
 #include "cast.h"
@@ -67,7 +68,7 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         .input = output_layer->layer_0_output,
         .size = sizeof(output_layer->layer_0_output) / sizeof(output_layer->layer_0_output[0]),
         .output = output_layer->layer_1_input};
-    FftAutoScale(&fft_params);
+    int scale_bits = FftAutoScale(&fft_params);
     printf("FFT done\n");
 
     AUDIO_PREPROCESSOR_Tensor_21 *tensor21 = (AUDIO_PREPROCESSOR_Tensor_21 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 21);
@@ -190,6 +191,17 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         output_layer->layer_9_output,
         tensor29->shape,
         sizeof(tensor29->shape) / sizeof(tensor29->shape[0]));
+
+    printf("Filter bank done\n");
+
+    SignalBankSquareRootParams signal_bank_square_root_params;
+    signal_bank_square_root_params.input = output_layer->layer_9_output;
+    signal_bank_square_root_params.scale_bits = scale_bits;
+    signal_bank_square_root_params.output = output_layer->layer_10_output;
+    signal_bank_square_root_params.num_channels = tensor29->shape[0];
+
+    SignalBankSquareRoot(&signal_bank_square_root_params);
+    printf("Bank square root done\n");
 }
 
 void print_bytes(void *ptr, int size)

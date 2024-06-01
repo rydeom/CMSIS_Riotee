@@ -28,11 +28,13 @@ SRC_FILES = \
   $(PRJ_ROOT)/src/model/utils/utils.c \
   $(PRJ_ROOT)/src/model/utils/fully_connected/fully_connected_utils.c \
   $(PRJ_ROOT)/src/model/utils/operators/cast.c \
+  $(PRJ_ROOT)/src/model/utils/signal/signal_utils.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_window.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_fft_auto_scale.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_rfft.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_energy.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_filter_bank.c \
+  $(PRJ_ROOT)/src/model/utils/signal/signal_bank_square_root.c \
 
 INC_DIRS = \
   $(PRJ_ROOT)/include \

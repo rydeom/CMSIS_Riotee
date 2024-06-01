@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "signal_fft_auto_scale.h"
+#include "signal_utils.h"
 
 int FftAutoScale(SignalFFTAutoScaleParams *params)
 {
@@ -16,31 +17,4 @@ int FftAutoScale(SignalFFTAutoScaleParams *params)
         params->output[i] = params->input[i] * (1 << scale_bits);
     }
     return scale_bits;
-}
-
-int16_t MaxAbs16(const int16_t *input, int size)
-{
-    int16_t max = 0;
-    for (int i = 0; i < size; i++)
-    {
-        const int16_t value = input[i];
-        if (value > max)
-        {
-            max = value;
-        }
-        else if (-value > max)
-        {
-            max = -value;
-        }
-    }
-    return max;
-}
-
-uint32_t MostSignificantBit32(uint32_t x)
-{
-    if (x)
-    {
-        return 32 - __builtin_clz(x);
-    }
-    return 32;
 }
