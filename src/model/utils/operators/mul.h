@@ -2,6 +2,7 @@
 #define MUL_H
 
 #include <stdint.h>
+#include "utils.h"
 
 typedef struct MulParams
 {
@@ -13,23 +14,6 @@ typedef struct MulParams
     int32_t output_activation_min;
     int32_t output_activation_max;
 } MulParams;
-
-int32_t ActivationFunctionWithMinMax(int32_t x, int32_t output_activation_min,
-                                     int32_t output_activation_max)
-{
-    if (x < output_activation_min)
-    {
-        return output_activation_min;
-    }
-    else if (x > output_activation_max)
-    {
-        return output_activation_max;
-    }
-    else
-    {
-        return x;
-    }
-}
 
 inline void Mul(const MulParams *params)
 {

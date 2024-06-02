@@ -29,4 +29,21 @@ void quantizeMultiplier(int32_t *quantized_multiplier,
                         float filter_scale,
                         float output_scale);
 
+inline int32_t ActivationFunctionWithMinMax(int32_t x, int32_t output_activation_min,
+                                            int32_t output_activation_max)
+{
+    if (x < output_activation_min)
+    {
+        return output_activation_min;
+    }
+    else if (x > output_activation_max)
+    {
+        return output_activation_max;
+    }
+    else
+    {
+        return x;
+    }
+}
+
 #endif

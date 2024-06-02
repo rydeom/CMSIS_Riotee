@@ -20,6 +20,7 @@
 #include "strided_slice.h"
 #include "concatenation.h"
 #include "mul.h"
+#include "add.h"
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)         \
@@ -285,6 +286,22 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     Mul(&mul_params);
     printf("Mul done\n");
+
+    AUDIO_PREPROCESSOR_Tensor_4 *tensor4 = (AUDIO_PREPROCESSOR_Tensor_4 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 4);
+    AUDIO_PREPROCESSOR_Tensor_37 *tensor37 = (AUDIO_PREPROCESSOR_Tensor_37 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 37);
+
+    AddParams add_params;
+    add_params.input1_data = output_layer->layer_14_output;
+    add_params.input2_data = tensor4->data;
+    add_params.output_data = output_layer->layer_15_output;
+    add_params.activation_min = INT32_MIN;
+    add_params.activation_max = INT32_MAX;
+    add_params.flat_size = flatSize(
+        sizeof(tensor37->shape) / sizeof(tensor37->shape[0]),
+        tensor37->shape);
+
+    Add(&add_params);
+    printf("Add done\n");
 }
 
 void print_bytes(void *ptr, int size)
