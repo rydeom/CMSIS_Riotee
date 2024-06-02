@@ -100,7 +100,21 @@
         "cmsis_compiler.h": "c",
         "utils.h": "c",
         "arm_nnsupportfunctions.h": "c",
-        "debug_log.h": "c"
+        "debug_log.h": "c",
+        "audio_preprocessor_model.h": "c",
+        "audio_preprocessor_operators.h": "c",
+        "signal_window.h": "c",
+        "micro_speech_tensors.h": "c",
+        "signal_fft_auto_scale.h": "c",
+        "kiss_fftr.h": "c",
+        "signal_rfft.h": "c",
+        "micro_speech_model.h": "c",
+        "layer_data.h": "c",
+        "signal_utils.h": "c",
+        "signal_energy.h": "c",
+        "signal_filter_bank.h": "c",
+        "signal_pcan.h": "c",
+        "signal_filter_bank_log.h": "c"
     },
     "editor.formatOnSave": true,
     "cortex-debug.variableUseNaturalFormat": true

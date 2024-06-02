@@ -2,7 +2,7 @@
 #define FULLY_CONNECTED_UTILS_H
 #include <stdint.h>
 #include "arm_nn_types.h"
-#include "operator.h"
+#include "audio_preprocessor_operators.h"
 
 void fill_dims(cmsis_nn_dims *input_dims, cmsis_nn_dims *filter_dims, cmsis_nn_dims *bias_dims, cmsis_nn_dims *output_dims, int32_t *weights, int32_t weights_size, int32_t *output, int32_t output_size);
 

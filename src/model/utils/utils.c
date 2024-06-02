@@ -3,7 +3,17 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <math.h>
-#include "operator.h"
+#include "audio_preprocessor_operators.h"
+
+int32_t flatSize(int32_t dims, int32_t *dims_data)
+{
+    int32_t flat_size = 1;
+    for (int32_t i = 0; i < dims; ++i)
+    {
+        flat_size *= dims_data[i];
+    }
+    return flat_size;
+}
 
 int32_t flatSizeSkipDim(int32_t dims, int32_t *dims_data, int32_t skip_dim)
 {
@@ -41,11 +51,11 @@ int quantizeInt8(float scale, int32_t zero_point, float f, int8_t *q)
 }
 
 int calculateActivationRangeQuantized(ActivationFunctionType activation,
-    TensorType type,
-    float scale,
-    int32_t zero_point,
-    int32_t *act_min,
-    int32_t *act_max)
+                                      TensorType type,
+                                      float scale,
+                                      int32_t zero_point,
+                                      int32_t *act_min,
+                                      int32_t *act_max)
 {
     int32_t qmin = 0;
     int32_t qmax = 0;
@@ -99,11 +109,37 @@ int calculateActivationRangeQuantized(ActivationFunctionType activation,
     return ret;
 }
 
+void CalculateActivationRange(ActivationFunctionType activation,
+                              int32_t *act_min,
+                              int32_t *act_max)
+{
+    if (activation == NONE)
+    {
+        *act_min = 0;
+        *act_max = INT32_MAX;
+    }
+    else if (activation == RELU6)
+    {
+        *act_min = 0;
+        *act_max = 6;
+    }
+    else if (activation == RELU_N1_TO_1)
+    {
+        *act_min = -1;
+        *act_max = 1;
+    }
+    else
+    {
+        *act_min = INT32_MIN;
+        *act_max = INT32_MAX;
+    }
+}
+
 void quantizeMultiplier(int32_t *quantized_multiplier,
-    int *shift,
-    float input_scale,
-    float filter_scale,
-    float output_scale)
+                        int *shift,
+                        float input_scale,
+                        float filter_scale,
+                        float output_scale)
 {
     double double_multiplier = ((double)input_scale) * ((double)filter_scale) / ((double)output_scale);
     if (double_multiplier == 0.)
@@ -128,4 +164,3 @@ void quantizeMultiplier(int32_t *quantized_multiplier,
     }
     *quantized_multiplier = (int32_t)(q_fixed);
 }
-
