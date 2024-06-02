@@ -24,3 +24,11 @@ void copyCastInt16ToInt32(int16_t *src, int32_t *dst, int size)
         dst[i] = (int32_t)src[i];
     }
 }
+
+void copyCastInt32ToInt8(int32_t *src, int8_t *dst, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        dst[i] = (int8_t)src[i];
+    }
+}

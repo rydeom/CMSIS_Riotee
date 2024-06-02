@@ -22,6 +22,7 @@
 #include "mul.h"
 #include "add.h"
 #include "div.h"
+#include "minimum_maximum.h"
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)         \
@@ -337,6 +338,39 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     Add(&add_params2);
     printf("Add done\n");
+
+    AUDIO_PREPROCESSOR_Tensor_14 *tensor14 = (AUDIO_PREPROCESSOR_Tensor_14 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 14);
+    AUDIO_PREPROCESSOR_Tensor_39 *tensor39 = (AUDIO_PREPROCESSOR_Tensor_39 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 39);
+
+    MinimumParams minimum_params;
+    minimum_params.input1_data = output_layer->layer_17_output;
+    minimum_params.input2_data = tensor14->data;
+    minimum_params.output_data = output_layer->layer_18_output;
+    minimum_params.flat_size = flatSize(
+        sizeof(tensor39->shape) / sizeof(tensor39->shape[0]),
+        tensor39->shape);
+
+    Minimum(&minimum_params);
+    printf("Minimum done\n");
+
+    AUDIO_PREPROCESSOR_Tensor_40 *tensor40 = (AUDIO_PREPROCESSOR_Tensor_40 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 40);
+
+    MaximumParams maximum_params;
+    maximum_params.input1_data = output_layer->layer_18_output;
+    maximum_params.input2_data = tensor16->data;
+    maximum_params.output_data = output_layer->layer_19_output;
+    maximum_params.flat_size = flatSize(
+        sizeof(tensor40->shape) / sizeof(tensor40->shape[0]),
+        tensor40->shape);
+
+    Maximum(&maximum_params);
+    printf("Maximum done\n");
+
+    copyCastInt32ToInt8(
+        output_layer->layer_19_output,
+        output_layer->layer_19_output,
+        sizeof(output_layer->layer_19_output) / sizeof(output_layer->layer_19_output[0]));
+    printf("Copy done\n");
 }
 
 void print_bytes(void *ptr, int size)
