@@ -19,6 +19,10 @@ int calculateActivationRangeQuantized(ActivationFunctionType activation,
                                       int32_t *act_min,
                                       int32_t *act_max);
 
+void CalculateActivationRange(ActivationFunctionType activation,
+                              int32_t *act_min,
+                              int32_t *act_max);
+
 void quantizeMultiplier(int32_t *quantized_multiplier,
                         int *shift,
                         float input_scale,

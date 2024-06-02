@@ -109,6 +109,32 @@ int calculateActivationRangeQuantized(ActivationFunctionType activation,
     return ret;
 }
 
+void CalculateActivationRange(ActivationFunctionType activation,
+                              int32_t *act_min,
+                              int32_t *act_max)
+{
+    if (activation == NONE)
+    {
+        *act_min = 0;
+        *act_max = INT32_MAX;
+    }
+    else if (activation == RELU6)
+    {
+        *act_min = 0;
+        *act_max = 6;
+    }
+    else if (activation == RELU_N1_TO_1)
+    {
+        *act_min = -1;
+        *act_max = 1;
+    }
+    else
+    {
+        *act_min = INT32_MIN;
+        *act_max = INT32_MAX;
+    }
+}
+
 void quantizeMultiplier(int32_t *quantized_multiplier,
                         int *shift,
                         float input_scale,
