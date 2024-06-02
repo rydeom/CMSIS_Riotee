@@ -21,6 +21,7 @@
 #include "concatenation.h"
 #include "mul.h"
 #include "add.h"
+#include "div.h"
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)         \
@@ -288,7 +289,7 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     printf("Mul done\n");
 
     AUDIO_PREPROCESSOR_Tensor_4 *tensor4 = (AUDIO_PREPROCESSOR_Tensor_4 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 4);
-    AUDIO_PREPROCESSOR_Tensor_37 *tensor37 = (AUDIO_PREPROCESSOR_Tensor_37 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 37);
+    AUDIO_PREPROCESSOR_Tensor_36 *tensor36 = (AUDIO_PREPROCESSOR_Tensor_36 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 36);
 
     AddParams add_params;
     add_params.input1_data = output_layer->layer_14_output;
@@ -297,10 +298,44 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     add_params.activation_min = INT32_MIN;
     add_params.activation_max = INT32_MAX;
     add_params.flat_size = flatSize(
+        sizeof(tensor36->shape) / sizeof(tensor36->shape[0]),
+        tensor36->shape);
+
+    Add(&add_params);
+    printf("Add done\n");
+
+    AUDIO_PREPROCESSOR_Tensor_18 *tensor18 = (AUDIO_PREPROCESSOR_Tensor_18 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 18);
+    AUDIO_PREPROCESSOR_Tensor_37 *tensor37 = (AUDIO_PREPROCESSOR_Tensor_37 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 37);
+
+    DivParams div_params;
+    div_params.input1_data = output_layer->layer_15_output;
+    div_params.input2_data = tensor18->data;
+    div_params.output_data = output_layer->layer_16_output;
+    CalculateActivationRange(
+        NONE,
+        &div_params.output_activation_min,
+        &div_params.output_activation_max);
+    div_params.flat_size = flatSize(
         sizeof(tensor37->shape) / sizeof(tensor37->shape[0]),
         tensor37->shape);
 
-    Add(&add_params);
+    Div(&div_params);
+    printf("Div done\n");
+
+    AUDIO_PREPROCESSOR_Tensor_16 *tensor16 = (AUDIO_PREPROCESSOR_Tensor_16 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 16);
+    AUDIO_PREPROCESSOR_Tensor_38 *tensor38 = (AUDIO_PREPROCESSOR_Tensor_38 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 38);
+
+    AddParams add_params2;
+    add_params2.input1_data = output_layer->layer_16_output;
+    add_params2.input2_data = tensor16->data;
+    add_params2.output_data = output_layer->layer_17_output;
+    add_params2.activation_min = INT32_MIN;
+    add_params2.activation_max = INT32_MAX;
+    add_params2.flat_size = flatSize(
+        sizeof(tensor38->shape) / sizeof(tensor38->shape[0]),
+        tensor38->shape);
+
+    Add(&add_params2);
     printf("Add done\n");
 }
 
