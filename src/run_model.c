@@ -56,28 +56,155 @@ riotee_rc_t run_model(const int16_t *audio_data, const size_t audio_data_size)
 
 void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 {
+
+    run_signal_window(
+        input_layer->layer_0_input,
+        sizeof(input_layer->layer_0_input) / sizeof(input_layer->layer_0_input[0]),
+        output_layer->layer_0_output);
+    printf("Signal window done\n");
+
+    int scale_bits = run_signal_fft_auto_scale(
+        output_layer->layer_2_output,
+        sizeof(output_layer->layer_2_output) / sizeof(output_layer->layer_2_output[0]),
+        input_layer->layer_2_output);
+    printf("FFT done\n");
+
+    run_signal_rfft(
+        input_layer->layer_3_input,
+        output_layer->layer_3_output);
+    printf("RFFT done\n");
+
+    run_signal_energy(
+        output_layer->layer_4_input,
+        input_layer->layer_4_output);
+    printf("Energy done\n");
+
+    copyCastUint32ToInt32(
+        input_layer->layer_5_input,
+        output_layer->layer_5_output,
+        sizeof(input_layer->layer_5_input) / sizeof(input_layer->layer_5_input[0]));
+    printf("Copy done\n");
+
+    run_strided_slice(
+        output_layer->layer_6_input,
+        input_layer->layer_6_output);
+    printf("Strided slice done\n");
+
+    run_connectation(
+        input_layer->layer_7_input,
+        output_layer->layer_7_output);
+    printf("Concatenation done\n");
+
+    copyCastInt32ToUint32(
+        output_layer->layer_8_output,
+        input_layer->layer_8_output,
+        sizeof(output_layer->layer_8_output) / sizeof(output_layer->layer_8_output[0]));
+    printf("Copy done\n");
+
+    run_signal_filter_bank(
+        input_layer->layer_9_input,
+        output_layer->layer_9_output);
+    printf("Filter bank done\n");
+
+    run_signal_bank_square_root(
+        output_layer->layer_10_input,
+        scale_bits,
+        input_layer->layer_10_output);
+    printf("Bank square root done\n");
+
+    AUDIO_PREPROCESSOR_Operator_11 *op11 = (AUDIO_PREPROCESSOR_Operator_11 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 11);
+    uint32_t noise_estimate[op11->builtin_options.num_channels];
+    run_signal_filter_bank_spectral_subtraction(
+        input_layer->layer_11_input,
+        output_layer->layer_11_output,
+        noise_estimate);
+    printf("Spectral subtraction done\n");
+
+    run_signal_pcan(
+        output_layer->layer_12_input,
+        input_layer->layer_12_output,
+        noise_estimate);
+    printf("PCAN done\n");
+
+    run_signal_filter_bank_log(
+        input_layer->layer_13_input,
+        output_layer->layer_13_output);
+    printf("Filter bank log done\n");
+
+    copyCastInt16ToInt32(
+        output_layer->layer_14_input,
+        input_layer->layer_14_output,
+        sizeof(output_layer->layer_14_input) / sizeof(output_layer->layer_14_input[0]));
+    printf("Copy done\n");
+
+    run_mul(
+        input_layer->layer_15_input,
+        output_layer->layer_15_output);
+    printf("Mul done\n");
+
+    run_add1(
+        output_layer->layer_16_input,
+        input_layer->layer_16_output);
+    printf("Add done\n");
+
+    run_div(
+        input_layer->layer_17_input,
+        output_layer->layer_17_output);
+    printf("Div done\n");
+
+    run_add2(
+        output_layer->layer_18_input,
+        input_layer->layer_18_output);
+    printf("Add done\n");
+
+    run_minimum(
+        input_layer->layer_19_input,
+        output_layer->layer_19_output);
+    printf("Minimum done\n");
+
+    run_maximum(
+        output_layer->layer_20_input,
+        input_layer->layer_20_output);
+    printf("Maximum done\n");
+
+    copyCastInt32ToInt8(
+        output_layer->layer_21_input,
+        input_layer->layer_21_output,
+        sizeof(output_layer->layer_21_input) / sizeof(output_layer->layer_21_input[0]));
+    printf("Copy done\n");
+
+    printf("Frame done\n");
+}
+
+void run_signal_window(int16_t *input, int32_t input_size, int16_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_0 *op0 = (AUDIO_PREPROCESSOR_Operator_0 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 0);
     AUDIO_PREPROCESSOR_Tensor_1 *tensor1 = (AUDIO_PREPROCESSOR_Tensor_1 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 1);
     SignalWindowParams params = {
-        .input = input_layer->layer_0_input,
-        .input_size = sizeof(input_layer->layer_0_input) / sizeof(input_layer->layer_0_input[0]),
+        .input = input,
+        .input_size = input_size,
         .weights = tensor1->data,
         .weight_size = sizeof(tensor1->data) / (sizeof(tensor1->data[0]) * 2),
         .shift = op0->builtin_options.shift,
-        .output = output_layer->layer_0_output};
+        .output = output};
 
     signal_apply_window(&params);
-    printf("Signal window done\n");
+}
+
+int run_signal_fft_auto_scale(int16_t *input, int32_t input_size, int16_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_2 *op2 = (AUDIO_PREPROCESSOR_Operator_2 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 2);
-    AUDIO_PREPROCESSOR_Tensor_15 *tensor15 = (AUDIO_PREPROCESSOR_Tensor_15 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 15);
 
     SignalFFTAutoScaleParams fft_params = {
-        .input = output_layer->layer_0_output,
-        .size = sizeof(output_layer->layer_0_output) / sizeof(output_layer->layer_0_output[0]),
-        .output = output_layer->layer_1_input};
-    int scale_bits = FftAutoScale(&fft_params);
-    printf("FFT done\n");
+        .input = input,
+        .size = input_size,
+        .output = output};
 
+    return FftAutoScale(&fft_params);
+}
+
+void run_signal_rfft(int16_t *input, Complex *output)
+{
     AUDIO_PREPROCESSOR_Tensor_21 *tensor21 = (AUDIO_PREPROCESSOR_Tensor_21 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 21);
     AUDIO_PREPROCESSOR_Tensor_23 *tensor23 = (AUDIO_PREPROCESSOR_Tensor_23 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 23);
 
@@ -88,34 +215,32 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     int16_t state_size = 5396;
 
     SignalRfftParams rfft_params = {
-        .input = input_layer->layer_3_output,
+        .input = input,
         .input_length = input_length,
         .input_size = input_size,
-        .output = output_layer->layer_4_input,
+        .output = output,
         .output_length = output_length,
         .fft_length = fft_length,
         .state_size = state_size};
 
     RfftInt16(&rfft_params);
-    printf("RFFT done\n");
+}
 
+void run_signal_energy(Complex *input, uint32_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_4 *op4 = (AUDIO_PREPROCESSOR_Operator_4 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 4);
 
     SignalEnergyParams energy_params = {
-        .input = output_layer->layer_4_input,
-        .output = output_layer->layer_4_output,
+        .input = input,
+        .output = output,
         .start_index = op4->builtin_options.start_index,
         .end_index = op4->builtin_options.end_index};
 
     apply_energy(&energy_params);
-    printf("Energy done\n");
+}
 
-    copyCastUint32ToInt32(
-        output_layer->layer_5_input,
-        output_layer->layer_5_output,
-        sizeof(output_layer->layer_5_input) / sizeof(output_layer->layer_5_input[0]));
-    printf("Copy done\n");
-
+void run_strided_slice(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_6 *op6 = (AUDIO_PREPROCESSOR_Operator_6 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 6);
     AUDIO_PREPROCESSOR_Tensor_7 *tensor7 = (AUDIO_PREPROCESSOR_Tensor_7 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 7);
     AUDIO_PREPROCESSOR_Tensor_6 *tensor6 = (AUDIO_PREPROCESSOR_Tensor_6 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 6);
@@ -138,10 +263,14 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     strided_slice_params.new_axis_mask = 0;
     strided_slice_params.shrink_axis_mask = op6->builtin_options.shrink_axis_mask;
     strided_slice_params.offset = op6->builtin_options.offset;
+    strided_slice_params.input = input;
+    strided_slice_params.output = output;
 
     StridedSlice(&strided_slice_params);
-    printf("Strided slice done\n");
+}
 
+void run_connectation(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_7 *op7 = (AUDIO_PREPROCESSOR_Operator_7 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 7);
 
     AUDIO_PREPROCESSOR_Tensor_2 *tensor2 = (AUDIO_PREPROCESSOR_Tensor_2 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 2);
@@ -154,26 +283,24 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         op7->builtin_options.axis,
         ((AUDIO_PREPROCESSOR_Tensor_27 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 27))->shape[0]);
     concatenation_params.inputs_count = sizeof(op7->inputs) / sizeof(op7->inputs[0]);
-    concatenation_params.input = output_layer->layer_6_output;
+    concatenation_params.input = (int32_t *[]){
+        tensor3->data,
+        input,
+        tensor2->data};
     concatenation_params.input_shapes = (int32_t *[]){
         ((AUDIO_PREPROCESSOR_Tensor_3 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 3))->shape,
         ((AUDIO_PREPROCESSOR_Tensor_26 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 26))->shape,
         ((AUDIO_PREPROCESSOR_Tensor_2 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 2))->shape,
     };
-    concatenation_params.output = output_layer->layer_7_output;
+    concatenation_params.output = output;
     concatenation_params.output_shape = ((AUDIO_PREPROCESSOR_Tensor_27 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 27))->shape;
     concatenation_params.output_shape_size = sizeof(concatenation_params.output_shape) / sizeof(concatenation_params.output_shape[0]);
 
     RunConcatenation(&concatenation_params);
+}
 
-    printf("Concatenation done\n");
-
-    copyCastInt32ToUint32(
-        output_layer->layer_7_output,
-        output_layer->layer_7_output,
-        sizeof(output_layer->layer_7_output) / sizeof(output_layer->layer_7_output[0]));
-    printf("Copy done\n");
-
+void run_signal_filter_bank(uint32_t *input, uint64_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_9 *op9 = (AUDIO_PREPROCESSOR_Operator_9 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 9);
     AUDIO_PREPROCESSOR_Tensor_13 *tensor13 = (AUDIO_PREPROCESSOR_Tensor_13 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 13);
     AUDIO_PREPROCESSOR_Tensor_12 *tensor12 = (AUDIO_PREPROCESSOR_Tensor_12 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 12);
@@ -194,25 +321,28 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 
     FilterbankAccumulateChannels(
         &signal_filter_bank_params,
-        output_layer->layer_7_output,
-        output_layer->layer_9_output,
+        input,
+        output,
         tensor29->shape,
         sizeof(tensor29->shape) / sizeof(tensor29->shape[0]));
+}
 
-    printf("Filter bank done\n");
+void run_signal_bank_square_root(uint64_t *input, int32_t scale_bits, uint32_t *output)
+{
+    AUDIO_PREPROCESSOR_Tensor_29 *tensor29 = (AUDIO_PREPROCESSOR_Tensor_29 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 29);
 
     SignalBankSquareRootParams signal_bank_square_root_params;
-    signal_bank_square_root_params.input = output_layer->layer_9_output;
+    signal_bank_square_root_params.input = input;
     signal_bank_square_root_params.scale_bits = scale_bits;
-    signal_bank_square_root_params.output = output_layer->layer_10_output;
+    signal_bank_square_root_params.output = output;
     signal_bank_square_root_params.num_channels = tensor29->shape[0];
 
     SignalBankSquareRoot(&signal_bank_square_root_params);
-    printf("Bank square root done\n");
+}
 
+void run_signal_filter_bank_spectral_subtraction(uint32_t *input, uint32_t *output, uint32_t *noise_estimate)
+{
     AUDIO_PREPROCESSOR_Operator_11 *op11 = (AUDIO_PREPROCESSOR_Operator_11 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 11);
-
-    uint32_t noise_estimate[signal_bank_square_root_params.num_channels];
 
     SpectralSubtractionConfig spectral_subtraction_config = {
         .num_channels = op11->builtin_options.num_channels,
@@ -226,22 +356,24 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         .clamping = op11->builtin_options.clamping};
 
     SignalFilterBankSpectralSubtractionParams signal_filter_bank_spectral_subtraction_params;
-    signal_filter_bank_spectral_subtraction_params.input = output_layer->layer_10_output;
-    signal_filter_bank_spectral_subtraction_params.output = output_layer->layer_11_output;
+    signal_filter_bank_spectral_subtraction_params.input = input;
+    signal_filter_bank_spectral_subtraction_params.output = output;
     signal_filter_bank_spectral_subtraction_params.config = &spectral_subtraction_config;
     signal_filter_bank_spectral_subtraction_params.noise_estimate = noise_estimate;
     signal_filter_bank_spectral_subtraction_params.noise_estimate_size = sizeof(noise_estimate) / sizeof(noise_estimate[0]);
 
     SignalFilterBankSpectralSubtraction(&signal_filter_bank_spectral_subtraction_params);
-    printf("Spectral subtraction done\n");
+}
 
+void run_signal_pcan(uint32_t *input, uint32_t *output, uint32_t *noise_estimate)
+{
     AUDIO_PREPROCESSOR_Operator_12 *op12 = (AUDIO_PREPROCESSOR_Operator_12 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 12);
     AUDIO_PREPROCESSOR_Tensor_8 *tensor8 = (AUDIO_PREPROCESSOR_Tensor_8 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 8);
     AUDIO_PREPROCESSOR_Tensor_33 *tensor33 = (AUDIO_PREPROCESSOR_Tensor_33 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 33);
 
     SignalPcanParams signal_pcan_params;
-    signal_pcan_params.input = output_layer->layer_11_output;
-    signal_pcan_params.output = output_layer->layer_12_output;
+    signal_pcan_params.input = input;
+    signal_pcan_params.output = output;
     signal_pcan_params.snr_shift = op12->builtin_options.snr_shift;
     signal_pcan_params.noise_estimate = noise_estimate;
     signal_pcan_params.noise_estimate_size = sizeof(noise_estimate) / sizeof(noise_estimate[0]);
@@ -250,52 +382,52 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
     signal_pcan_params.num_channels = tensor33->shape[0];
 
     SignalPcan(&signal_pcan_params);
-    printf("PCAN done\n");
+}
 
+void run_signal_filter_bank_log(uint32_t *input, int16_t *output)
+{
     AUDIO_PREPROCESSOR_Operator_13 *op13 = (AUDIO_PREPROCESSOR_Operator_13 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 13);
     AUDIO_PREPROCESSOR_Tensor_34 *tensor34 = (AUDIO_PREPROCESSOR_Tensor_34 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 34);
 
     SignalFilterBankLogParams signal_filter_bank_log_params;
-    signal_filter_bank_log_params.input = output_layer->layer_12_output;
-    signal_filter_bank_log_params.output = output_layer->layer_13_output;
+    signal_filter_bank_log_params.input = input;
+    signal_filter_bank_log_params.output = output;
     signal_filter_bank_log_params.input_correction_bits = op13->builtin_options.input_correction_bits;
     signal_filter_bank_log_params.output_scale = op13->builtin_options.output_scale;
     signal_filter_bank_log_params.num_channels = tensor34->shape[0];
 
     SignalFilterbankLog(&signal_filter_bank_log_params);
-    printf("Filter bank log done\n");
+}
 
-    copyCastInt16ToInt32(
-        output_layer->layer_13_output,
-        output_layer->layer_13_output,
-        sizeof(output_layer->layer_13_output) / sizeof(output_layer->layer_13_output[0]));
-    printf("Copy done\n");
-
+void run_mul(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Tensor_35 *tensor35 = (AUDIO_PREPROCESSOR_Tensor_35 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 35);
     AUDIO_PREPROCESSOR_Tensor_17 *tensor17 = (AUDIO_PREPROCESSOR_Tensor_17 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 17);
 
     MulParams mul_params;
-    mul_params.input = output_layer->layer_13_output;
+    mul_params.input = input;
     mul_params.flat_size = flatSize(
         sizeof(tensor35->shape) / sizeof(tensor35->shape[0]),
         tensor35->shape);
     mul_params.input2 = tensor17->data;
-    mul_params.output = output_layer->layer_14_output;
+    mul_params.output = output;
     CalculateActivationRange(
         NONE,
         &mul_params.output_activation_min,
         &mul_params.output_activation_max);
 
     Mul(&mul_params);
-    printf("Mul done\n");
+}
 
+void run_add1(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Tensor_4 *tensor4 = (AUDIO_PREPROCESSOR_Tensor_4 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 4);
     AUDIO_PREPROCESSOR_Tensor_36 *tensor36 = (AUDIO_PREPROCESSOR_Tensor_36 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 36);
 
     AddParams add_params;
-    add_params.input1_data = output_layer->layer_14_output;
+    add_params.input1_data = output;
     add_params.input2_data = tensor4->data;
-    add_params.output_data = output_layer->layer_15_output;
+    add_params.output_data = output;
     add_params.activation_min = INT32_MIN;
     add_params.activation_max = INT32_MAX;
     add_params.flat_size = flatSize(
@@ -303,15 +435,17 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         tensor36->shape);
 
     Add(&add_params);
-    printf("Add done\n");
+}
 
+void run_div(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Tensor_18 *tensor18 = (AUDIO_PREPROCESSOR_Tensor_18 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 18);
     AUDIO_PREPROCESSOR_Tensor_37 *tensor37 = (AUDIO_PREPROCESSOR_Tensor_37 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 37);
 
     DivParams div_params;
-    div_params.input1_data = output_layer->layer_15_output;
+    div_params.input1_data = input;
     div_params.input2_data = tensor18->data;
-    div_params.output_data = output_layer->layer_16_output;
+    div_params.output_data = output;
     CalculateActivationRange(
         NONE,
         &div_params.output_activation_min,
@@ -321,15 +455,17 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         tensor37->shape);
 
     Div(&div_params);
-    printf("Div done\n");
+}
 
+void run_add2(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Tensor_16 *tensor16 = (AUDIO_PREPROCESSOR_Tensor_16 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 16);
     AUDIO_PREPROCESSOR_Tensor_38 *tensor38 = (AUDIO_PREPROCESSOR_Tensor_38 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 38);
 
     AddParams add_params2;
-    add_params2.input1_data = output_layer->layer_16_output;
+    add_params2.input1_data = input;
     add_params2.input2_data = tensor16->data;
-    add_params2.output_data = output_layer->layer_17_output;
+    add_params2.output_data = output;
     add_params2.activation_min = INT32_MIN;
     add_params2.activation_max = INT32_MAX;
     add_params2.flat_size = flatSize(
@@ -337,40 +473,38 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         tensor38->shape);
 
     Add(&add_params2);
-    printf("Add done\n");
+}
 
+void run_minimum(int32_t *input, int32_t *output)
+{
     AUDIO_PREPROCESSOR_Tensor_14 *tensor14 = (AUDIO_PREPROCESSOR_Tensor_14 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 14);
     AUDIO_PREPROCESSOR_Tensor_39 *tensor39 = (AUDIO_PREPROCESSOR_Tensor_39 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 39);
 
     MinimumParams minimum_params;
-    minimum_params.input1_data = output_layer->layer_17_output;
+    minimum_params.input1_data = input;
     minimum_params.input2_data = tensor14->data;
-    minimum_params.output_data = output_layer->layer_18_output;
+    minimum_params.output_data = output;
     minimum_params.flat_size = flatSize(
         sizeof(tensor39->shape) / sizeof(tensor39->shape[0]),
         tensor39->shape);
 
     Minimum(&minimum_params);
-    printf("Minimum done\n");
+}
 
+void run_maximum(int32_t *input, int32_t *output)
+{
+    AUDIO_PREPROCESSOR_Tensor_16 *tensor16 = (AUDIO_PREPROCESSOR_Tensor_16 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 16);
     AUDIO_PREPROCESSOR_Tensor_40 *tensor40 = (AUDIO_PREPROCESSOR_Tensor_40 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 40);
 
     MaximumParams maximum_params;
-    maximum_params.input1_data = output_layer->layer_18_output;
+    maximum_params.input1_data = input;
     maximum_params.input2_data = tensor16->data;
-    maximum_params.output_data = output_layer->layer_19_output;
+    maximum_params.output_data = output;
     maximum_params.flat_size = flatSize(
         sizeof(tensor40->shape) / sizeof(tensor40->shape[0]),
         tensor40->shape);
 
     Maximum(&maximum_params);
-    printf("Maximum done\n");
-
-    copyCastInt32ToInt8(
-        output_layer->layer_19_output,
-        output_layer->layer_19_output,
-        sizeof(output_layer->layer_19_output) / sizeof(output_layer->layer_19_output[0]));
-    printf("Copy done\n");
 }
 
 void print_bytes(void *ptr, int size)

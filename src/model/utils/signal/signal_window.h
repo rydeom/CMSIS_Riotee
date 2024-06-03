@@ -8,9 +8,10 @@ typedef struct SignalWindowParams
     int32_t input_size;
     int32_t shift;
     int32_t weight_size;
-    uint8_t *input;
-    uint8_t *weights;
-    uint8_t *output;
+
+    int16_t *input;
+    int16_t *weights;
+    int16_t *output;
 } SignalWindowParams;
 
 void signal_apply_window(SignalWindowParams *params);

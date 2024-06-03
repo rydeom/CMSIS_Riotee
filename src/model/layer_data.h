@@ -13,8 +13,8 @@ typedef union LayersPuts
     int16_t layer_2_input[480];
     int16_t layer_2_output[480];
     int16_t layer_3_input[480];
-    struct Complex layer_3_output[257];
-    struct Complex layer_4_input[257];
+    Complex layer_3_output[257];
+    Complex layer_4_input[257];
     uint32_t layer_4_output[257];
     uint32_t layer_5_input[257];
     int32_t layer_5_output[257];
