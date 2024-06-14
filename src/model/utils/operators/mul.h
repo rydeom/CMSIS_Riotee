@@ -6,30 +6,32 @@
 
 typedef struct MulParams
 {
-    int32_t *input;
-    int32_t flat_size;
-    int32_t *input2;
-    int32_t *output;
+    const int32_t *input1_data;
+    const int32_t *input1_shape;
+    int32_t input1_shape_size;
+    const int32_t *input2_data;
+    const int32_t *input2_shape;
+    int32_t input2_shape_size;
+    int32_t *output_data;
+    int32_t *output_shape;
+    int32_t output_shape_size;
 
     int32_t output_activation_min;
     int32_t output_activation_max;
+    int32_t flat_size;
 } MulParams;
 
-inline void Mul(const MulParams *params)
+typedef struct NdArrayDesc
 {
-    const int32_t *input = params->input;
-    const int32_t *input2 = params->input2;
-    int32_t *output = params->output;
-    const int32_t output_activation_min = params->output_activation_min;
-    const int32_t output_activation_max = params->output_activation_max;
-    const int32_t flat_size = params->flat_size;
+    // The "extent" of each dimension. Indices along dimension d must be in the
+    // half-open interval [0, extents[d]).
+    int extents[6];
 
-    for (int i = 0; i < flat_size; ++i)
-    {
-        output[i] = ActivationFunctionWithMinMax(
-            input[i] * input2[i], output_activation_min,
-            output_activation_max);
-    }
-}
+    // The number of *elements* (not bytes) between consecutive indices of each
+    // dimension.
+    int strides[6];
+} NdArrayDesc;
+
+inline void Mul(const MulParams *params);
 
 #endif // MUL_H

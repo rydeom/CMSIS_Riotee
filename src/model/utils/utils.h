@@ -29,6 +29,8 @@ void quantizeMultiplier(int32_t *quantized_multiplier,
                         float filter_scale,
                         float output_scale);
 
+void ExtendShape(const int32_t *input_shape, int32_t input_shape_size, int32_t *extended_shape, int32_t extended_shape_size);
+
 inline int32_t ActivationFunctionWithMinMax(int32_t x, int32_t output_activation_min,
                                             int32_t output_activation_max)
 {

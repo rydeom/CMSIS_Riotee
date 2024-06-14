@@ -9,8 +9,10 @@ typedef struct SignalRfftParams
 {
     const int16_t *input;
     struct Complex *output;
+    int16_t *working_buffer;
+    void *state;
+    int8_t state_size;
     int32_t fft_length;
-    int32_t state_size;
     int32_t input_length;
     int32_t input_size;
     int32_t output_length;

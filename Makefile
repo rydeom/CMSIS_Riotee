@@ -5,9 +5,9 @@ PRJ_ROOT := .
 OUTPUT_DIR := _build
 
 # Size of the user stack in bytes. Must be multiple of 4.
-RIOTEE_STACK_SIZE:= 4096
+RIOTEE_STACK_SIZE:= 8192
 # Size of retained memory in bytes including STACK_SIZE.
-RIOTEE_RAM_RETAINED_SIZE:= 40960
+RIOTEE_RAM_RETAINED_SIZE:= 49152
 
 
 ifndef RIOTEE_SDK_ROOT
@@ -28,6 +28,11 @@ SRC_FILES = \
   $(PRJ_ROOT)/src/model/utils/utils.c \
   $(PRJ_ROOT)/src/model/utils/fully_connected/fully_connected_utils.c \
   $(PRJ_ROOT)/src/model/utils/operators/cast.c \
+  $(PRJ_ROOT)/src/model/utils/operators/add.c \
+  $(PRJ_ROOT)/src/model/utils/operators/div.c \
+  $(PRJ_ROOT)/src/model/utils/operators/mul.c \
+  $(PRJ_ROOT)/src/model/utils/operators/strided_slice.c \
+  $(PRJ_ROOT)/src/model/utils/operators/minimum_maximum.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_utils.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_window.c \
   $(PRJ_ROOT)/src/model/utils/signal/signal_fft_auto_scale.c \
@@ -56,5 +61,6 @@ LIB_FILES += -lcmsis-nn -lcmsisdsp
 
 USER_DEFINES = -DARM_MATH_DSP
 USER_DEFINES += -DDISABLE_CAP_MONITOR
+USER_DEFINES += -DFIXED_POINT=16
 
 include $(RIOTEE_SDK_ROOT)/Makefile

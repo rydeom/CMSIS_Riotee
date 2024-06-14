@@ -166,6 +166,7 @@ func encodeSignalRfftOptions(options modelparser.SignalRfftOptions) []byte {
 	ret := []byte{}
 	bufferStride := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bufferStride, uint32(options.Fft_length))
+	ret = append(ret, bufferStride...)
 	ret = append(ret, byte(options.TFLite_type))
 	ret = append(ret, byte(0), byte(0), byte(0)) // Padding
 

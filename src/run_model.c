@@ -43,10 +43,11 @@ riotee_rc_t run_model(const int16_t *audio_data, const size_t audio_data_size)
     union LayersPuts first_layer = {0};
     union LayersPuts second_layer = {0};
     printf("First layer start\n");
+    const int16_t g_yes_30ms_audio_data[480] = {-876, -470, 510, 803, 170, -787, -1568, -1893, -1598, -1027, -992, -1803, -2610, -2484, -1905, -2113, -3113, -3399, -2267, -1261, -2007, -3637, -3909, -2340, -893, -1158, -2272, -2486, -1639, -915, -777, -596, -91, 196, 85, 210, 875, 1373, 1247, 1219, 1958, 2718, 2328, 1196, 1008, 2350, 3677, 3269, 1503, 366, 922, 2264, 2810, 1996, 608, -168, 75, 680, 811, 395, -56, -318, -607, -966, -1108, -925, -613, -368, -369, -919, -1926, -2460, -1685, -300, 155, -611, -1524, -2204, -3227, -3859, -2037, 1622, 2382, -2583, -8448, -7544, -84, 4814, 915, -6423, -7558, -1746, 2515, -59, -4587, -3858, 1260, 3625, 187, -4148, -3500, 1542, 5467, 4780, 1256, -1127, -403, 2481, 5332, 6346, 5014, 2536, 1216, 2467, 5039, 6238, 5070, 3381, 3269, 4173, 3905, 2248, 1586, 3299, 5240, 4362, 1004, -1382, -489, 2113, 3168, 1620, -742, -1824, -1435, -897, -1058, -1500, -1545, -1398, -1965, -3266, -4136, -3756, -2609, -1804, -1986, -3087, -4599, -5296, -4051, -1731, -781, -2228, -4092, -3977, -2325, -1353, -1568, -1490, -428, 178, -672, -1650, -1058, 749, 2039, 2079, 1540, 897, 310, 572, 2266, 4265, 4265, 1869, -231, 559, 3332, 4752, 3229, 768, 101, 1364, 2463, 1984, 819, 411, 723, 675, -162, -923, -743, -32, 185, -516, -1653, -2359, -2103, -986, 42, -205, -1702, -2870, -2337, -809, -221, -982, -1544, -946, -598, -2117, -4291, -4100, -857, 1948, 338, -4799, -7972, -5403, 173, 2371, -1063, -5533, -5578, -1777, 605, -985, -3249, -2213, 1184, 2691, 560, -2356, -2288, 1233, 5244, 6441, 4004, 370, -663, 2555, 7404, 9282, 6573, 2612, 1836, 4662, 7467, 7393, 5421, 4262, 4741, 5362, 4705, 3163, 2397, 3337, 4887, 4810, 2254, -749, -1316, 772, 2706, 2016, -573, -2552, -2746, -2012, -1647, -1978, -2579, -3105, -3473, -3911, -4484, -4891, -4795, -4163, -3543, -3538, -4275, -5356, -5743, -4637, -2614, -1301, -1825, -3341, -4011, -2937, -751, 1007, 1245, 235, -639, -61, 1626, 2864, 2967, 2734, 3013, 3329, 2914, 2312, 2666, 3839, 4308, 3162, 1453, 768, 1255, 1887, 2006, 1715, 1031, -297, -1660, -1690, -277, 813, -30, -2137, -3370, -2854, -1553, -593, -413, -1146, -2567, -3440, -2369, -205, 379, -1258, -2315, -812, 262, -3205, -8576, -7894, 738, 7492, 1951, -11595, -17098, -6934, 7139, 8065, -4575, -14199, -8946, 3606, 7504, -547, -8242, -5113, 4406, 8113, 2134, -5040, -4089, 4157, 10934, 10158, 4167, -565, -192, 4428, 9765, 12201, 9861, 4512, 1225, 3451, 8483, 10133, 6497, 2574, 3333, 6806, 6986, 2487, -1214, 623, 5416, 6647, 2204, -3289, -4556, -1565, 1544, 1525, -1236, -4293, -5695, -5174, -3995, -3403, -3449, -3750, -4505, -6014, -7296, -6523, -3849, -2096, -3288, -5722, -6004, -3581, -1497, -1960, -3330, -2800, -434, 964, -111, -1739, -1136, 1736, 4151, 3736, 1274, -451, 469, 3386, 5833, 5898, 3646, 1085, 272, 1743, 4061, 5108, 3837, 1490, 246, 967, 1866, 859, -1069, -974, 1542, 2835, 47, -4285, -5068, -1567, 1781, 1223, -1997, -4227, -3747, -1720, 41, 245, -1228, -2972, -2673, 22, 1980, -930, -7721, -11271, -5725, 4974, 8484, -2007, -16979, -19255, -4670, 11057, 9690, -6417, -17537, -10841, 4262, 9292};
 
     for (int i = 0; i < 480; i++)
     {
-        first_layer.layer_0_input[i] = audio_data[i];
+        first_layer.layer_0_input[i] = g_yes_30ms_audio_data[i];
     }
     run_frame(&first_layer, &second_layer);
 
@@ -56,122 +57,130 @@ riotee_rc_t run_model(const int16_t *audio_data, const size_t audio_data_size)
 
 void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
 {
-
     run_signal_window(
         input_layer->layer_0_input,
         sizeof(input_layer->layer_0_input) / sizeof(input_layer->layer_0_input[0]),
         output_layer->layer_0_output);
-    printf("Signal window done\n");
-
     int scale_bits = run_signal_fft_auto_scale(
         output_layer->layer_2_output,
         sizeof(output_layer->layer_2_output) / sizeof(output_layer->layer_2_output[0]),
         input_layer->layer_2_output);
-    printf("FFT done\n");
-
     run_signal_rfft(
         input_layer->layer_3_input,
         output_layer->layer_3_output);
-    printf("RFFT done\n");
-
     run_signal_energy(
         output_layer->layer_4_input,
         input_layer->layer_4_output);
-    printf("Energy done\n");
-
     copyCastUint32ToInt32(
         input_layer->layer_5_input,
         output_layer->layer_5_output,
         sizeof(input_layer->layer_5_input) / sizeof(input_layer->layer_5_input[0]));
-    printf("Copy done\n");
-
     run_strided_slice(
         output_layer->layer_6_input,
         input_layer->layer_6_output);
-    printf("Strided slice done\n");
-
     run_connectation(
         input_layer->layer_7_input,
         output_layer->layer_7_output);
-    printf("Concatenation done\n");
-
     copyCastInt32ToUint32(
-        output_layer->layer_8_output,
+        output_layer->layer_8_input,
         input_layer->layer_8_output,
-        sizeof(output_layer->layer_8_output) / sizeof(output_layer->layer_8_output[0]));
-    printf("Copy done\n");
-
+        sizeof(output_layer->layer_8_input) / sizeof(output_layer->layer_8_input[0]));
     run_signal_filter_bank(
         input_layer->layer_9_input,
         output_layer->layer_9_output);
-    printf("Filter bank done\n");
-
     run_signal_bank_square_root(
         output_layer->layer_10_input,
         scale_bits,
         input_layer->layer_10_output);
-    printf("Bank square root done\n");
-
     AUDIO_PREPROCESSOR_Operator_11 *op11 = (AUDIO_PREPROCESSOR_Operator_11 *)AUDIO_PREPROCESSOR_get_operator(&audio_preprocessor_model->operators, 11);
     uint32_t noise_estimate[op11->builtin_options.num_channels];
     run_signal_filter_bank_spectral_subtraction(
         input_layer->layer_11_input,
         output_layer->layer_11_output,
         noise_estimate);
-    printf("Spectral subtraction done\n");
-
     run_signal_pcan(
         output_layer->layer_12_input,
         input_layer->layer_12_output,
         noise_estimate);
-    printf("PCAN done\n");
-
     run_signal_filter_bank_log(
         input_layer->layer_13_input,
         output_layer->layer_13_output);
-    printf("Filter bank log done\n");
-
     copyCastInt16ToInt32(
         output_layer->layer_14_input,
         input_layer->layer_14_output,
         sizeof(output_layer->layer_14_input) / sizeof(output_layer->layer_14_input[0]));
-    printf("Copy done\n");
-
     run_mul(
         input_layer->layer_15_input,
         output_layer->layer_15_output);
-    printf("Mul done\n");
-
     run_add1(
         output_layer->layer_16_input,
         input_layer->layer_16_output);
-    printf("Add done\n");
-
     run_div(
         input_layer->layer_17_input,
         output_layer->layer_17_output);
-    printf("Div done\n");
-
     run_add2(
         output_layer->layer_18_input,
         input_layer->layer_18_output);
-    printf("Add done\n");
-
     run_minimum(
         input_layer->layer_19_input,
         output_layer->layer_19_output);
-    printf("Minimum done\n");
-
     run_maximum(
         output_layer->layer_20_input,
         input_layer->layer_20_output);
-    printf("Maximum done\n");
-
     copyCastInt32ToInt8(
-        output_layer->layer_21_input,
-        input_layer->layer_21_output,
-        sizeof(output_layer->layer_21_input) / sizeof(output_layer->layer_21_input[0]));
-    printf("Copy done\n");
+        input_layer->layer_21_input,
+        output_layer->layer_21_output,
+        sizeof(input_layer->layer_21_input) / sizeof(input_layer->layer_21_input[0]));
+
+    printf("Output layer: \n");
+    int8_t expected_feature[40] = {
+        124,
+        105,
+        126,
+        103,
+        125,
+        101,
+        123,
+        100,
+        116,
+        98,
+        115,
+        97,
+        113,
+        90,
+        91,
+        82,
+        104,
+        96,
+        117,
+        97,
+        121,
+        103,
+        126,
+        101,
+        125,
+        104,
+        126,
+        104,
+        125,
+        101,
+        116,
+        90,
+        81,
+        74,
+        80,
+        71,
+        83,
+        76,
+        82,
+        71,
+    };
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("(%d = %d) (%d = %d) (%d = %d) (%d = %d)\n", expected_feature[i * 4], output_layer->layer_21_output[i * 4], expected_feature[i * 4 + 1], output_layer->layer_21_output[i * 4 + 1], expected_feature[i * 4 + 2], output_layer->layer_21_output[i * 4 + 2], expected_feature[i * 4 + 3], output_layer->layer_21_output[i * 4 + 3]);
+    }
+    printf("\n");
 
     printf("Frame done\n");
 }
@@ -207,12 +216,16 @@ void run_signal_rfft(int16_t *input, Complex *output)
 {
     AUDIO_PREPROCESSOR_Tensor_21 *tensor21 = (AUDIO_PREPROCESSOR_Tensor_21 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 21);
     AUDIO_PREPROCESSOR_Tensor_23 *tensor23 = (AUDIO_PREPROCESSOR_Tensor_23 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 23);
+    size_t needed_memory = RfftInt16GetNeededMemory(512);
+    // printf("Needed memory: %d\n", needed_memory);
 
     int32_t input_length = tensor21->shape[0];
     int32_t input_size = flatSize(sizeof(tensor21->shape) / sizeof(tensor21->shape[0]), tensor21->shape);
     int32_t output_length = tensor23->shape[(sizeof(tensor23->shape) / sizeof(tensor23->shape[0]) - 1)] / 2;
     int16_t fft_length = 512;
-    int16_t state_size = 5396;
+    int16_t state_size = 2836;
+    int16_t working_buffer[fft_length];
+    int8_t state[state_size];
 
     SignalRfftParams rfft_params = {
         .input = input,
@@ -220,8 +233,10 @@ void run_signal_rfft(int16_t *input, Complex *output)
         .input_size = input_size,
         .output = output,
         .output_length = output_length,
-        .fft_length = fft_length,
-        .state_size = state_size};
+        .working_buffer = working_buffer,
+        .state = state,
+        .state_size = state_size,
+        .fft_length = fft_length};
 
     RfftInt16(&rfft_params);
 }
@@ -245,7 +260,8 @@ void run_strided_slice(int32_t *input, int32_t *output)
     AUDIO_PREPROCESSOR_Tensor_7 *tensor7 = (AUDIO_PREPROCESSOR_Tensor_7 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 7);
     AUDIO_PREPROCESSOR_Tensor_6 *tensor6 = (AUDIO_PREPROCESSOR_Tensor_6 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 6);
     AUDIO_PREPROCESSOR_Tensor_5 *tensor5 = (AUDIO_PREPROCESSOR_Tensor_5 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 5);
-    int8_t dims = sizeof(op6->inputs) / sizeof(op6->inputs[0]);
+    AUDIO_PREPROCESSOR_Tensor_25 *tensor25 = (AUDIO_PREPROCESSOR_Tensor_25 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 25);
+    int8_t dims = 1;
 
     StridedSliceParams strided_slice_params;
     strided_slice_params.start_indices_count = dims;
@@ -258,12 +274,14 @@ void run_strided_slice(int32_t *input, int32_t *output)
         strided_slice_params.strides[i] = ((int32_t *)tensor5->data)[i];
     }
     strided_slice_params.begin_mask = op6->builtin_options.begin_mask;
-    strided_slice_params.ellipsis_mask = 0;
+    strided_slice_params.ellipsis_mask = op6->builtin_options.ellipsis_mask;
     strided_slice_params.end_mask = op6->builtin_options.end_mask;
-    strided_slice_params.new_axis_mask = 0;
+    strided_slice_params.new_axis_mask = op6->builtin_options.new_axis_mask;
     strided_slice_params.shrink_axis_mask = op6->builtin_options.shrink_axis_mask;
     strided_slice_params.offset = op6->builtin_options.offset;
     strided_slice_params.input = input;
+    strided_slice_params.input_shape = tensor25->shape;
+    strided_slice_params.input_shape_size = sizeof(tensor25->shape) / sizeof(tensor25->shape[0]);
     strided_slice_params.output = output;
 
     StridedSlice(&strided_slice_params);
@@ -281,19 +299,18 @@ void run_connectation(int32_t *input, int32_t *output)
     ConcatenationParams concatenation_params;
     concatenation_params.axis = CalculatePositiveAxis(
         op7->builtin_options.axis,
-        ((AUDIO_PREPROCESSOR_Tensor_27 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 27))->shape[0]);
+        tensor27->shape[0]);
     concatenation_params.inputs_count = sizeof(op7->inputs) / sizeof(op7->inputs[0]);
     concatenation_params.input = (int32_t *[]){
         tensor3->data,
         input,
         tensor2->data};
     concatenation_params.input_shapes = (int32_t *[]){
-        ((AUDIO_PREPROCESSOR_Tensor_3 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 3))->shape,
-        ((AUDIO_PREPROCESSOR_Tensor_26 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 26))->shape,
-        ((AUDIO_PREPROCESSOR_Tensor_2 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 2))->shape,
-    };
+        tensor3->shape,
+        tensor26->shape,
+        tensor2->shape};
     concatenation_params.output = output;
-    concatenation_params.output_shape = ((AUDIO_PREPROCESSOR_Tensor_27 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 27))->shape;
+    concatenation_params.output_shape = tensor27->shape;
     concatenation_params.output_shape_size = sizeof(concatenation_params.output_shape) / sizeof(concatenation_params.output_shape[0]);
 
     RunConcatenation(&concatenation_params);
@@ -311,7 +328,7 @@ void run_signal_filter_bank(uint32_t *input, uint64_t *output)
 
     SignalFilterBankParams signal_filter_bank_params;
     signal_filter_bank_params.config.num_channels = op9->builtin_options.num_channels;
-    uint64_t work_area[signal_filter_bank_params.config.num_channels + 1];
+    uint64_t work_area[41];
     signal_filter_bank_params.work_area = work_area;
     signal_filter_bank_params.config.weights = tensor13->data;
     signal_filter_bank_params.config.unweights = tensor12->data;
@@ -403,14 +420,22 @@ void run_mul(int32_t *input, int32_t *output)
 {
     AUDIO_PREPROCESSOR_Tensor_35 *tensor35 = (AUDIO_PREPROCESSOR_Tensor_35 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 35);
     AUDIO_PREPROCESSOR_Tensor_17 *tensor17 = (AUDIO_PREPROCESSOR_Tensor_17 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 17);
+    AUDIO_PREPROCESSOR_Tensor_36 *tensor36 = (AUDIO_PREPROCESSOR_Tensor_36 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 36);
 
     MulParams mul_params;
-    mul_params.input = input;
+    mul_params.input1_data = input;
+    mul_params.input1_shape = tensor35->shape;
+    mul_params.input1_shape_size = sizeof(tensor35->shape) / sizeof(tensor35->shape[0]);
     mul_params.flat_size = flatSize(
         sizeof(tensor35->shape) / sizeof(tensor35->shape[0]),
         tensor35->shape);
-    mul_params.input2 = tensor17->data;
-    mul_params.output = output;
+    mul_params.input2_data = tensor17->data;
+    mul_params.input2_shape = tensor17->shape;
+    mul_params.input2_shape_size = sizeof(tensor17->shape) / sizeof(tensor17->shape[0]);
+    mul_params.output_data = output;
+    mul_params.output_shape = tensor36->shape;
+    mul_params.output_shape_size = sizeof(tensor36->shape) / sizeof(tensor36->shape[0]);
+
     CalculateActivationRange(
         NONE,
         &mul_params.output_activation_min,
@@ -425,8 +450,12 @@ void run_add1(int32_t *input, int32_t *output)
     AUDIO_PREPROCESSOR_Tensor_36 *tensor36 = (AUDIO_PREPROCESSOR_Tensor_36 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 36);
 
     AddParams add_params;
-    add_params.input1_data = output;
+    add_params.input1_data = input;
+    add_params.input1_dims = tensor36->shape;
+    add_params.input1_dims_count = sizeof(tensor36->shape) / sizeof(tensor36->shape[0]);
     add_params.input2_data = tensor4->data;
+    add_params.input2_dims = tensor4->shape;
+    add_params.input2_dims_count = sizeof(tensor4->shape) / sizeof(tensor4->shape[0]);
     add_params.output_data = output;
     add_params.activation_min = INT32_MIN;
     add_params.activation_max = INT32_MAX;
@@ -441,11 +470,19 @@ void run_div(int32_t *input, int32_t *output)
 {
     AUDIO_PREPROCESSOR_Tensor_18 *tensor18 = (AUDIO_PREPROCESSOR_Tensor_18 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 18);
     AUDIO_PREPROCESSOR_Tensor_37 *tensor37 = (AUDIO_PREPROCESSOR_Tensor_37 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 37);
+    AUDIO_PREPROCESSOR_Tensor_38 *tensor38 = (AUDIO_PREPROCESSOR_Tensor_38 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 38);
 
     DivParams div_params;
     div_params.input1_data = input;
+    div_params.input1_shape = tensor37->shape;
+    div_params.input1_shape_size = sizeof(tensor37->shape) / sizeof(tensor37->shape[0]);
     div_params.input2_data = tensor18->data;
+    div_params.input2_shape = tensor18->shape;
+    div_params.input2_shape_size = sizeof(tensor18->shape) / sizeof(tensor18->shape[0]);
     div_params.output_data = output;
+    div_params.output_shape = tensor38->shape;
+    div_params.output_shape_size = sizeof(tensor38->shape) / sizeof(tensor38->shape[0]);
+
     CalculateActivationRange(
         NONE,
         &div_params.output_activation_min,
@@ -464,7 +501,11 @@ void run_add2(int32_t *input, int32_t *output)
 
     AddParams add_params2;
     add_params2.input1_data = input;
+    add_params2.input1_dims = tensor38->shape;
+    add_params2.input1_dims_count = sizeof(tensor38->shape) / sizeof(tensor38->shape[0]);
     add_params2.input2_data = tensor16->data;
+    add_params2.input2_dims = tensor16->shape;
+    add_params2.input2_dims_count = sizeof(tensor16->shape) / sizeof(tensor16->shape[0]);
     add_params2.output_data = output;
     add_params2.activation_min = INT32_MIN;
     add_params2.activation_max = INT32_MAX;
@@ -477,13 +518,20 @@ void run_add2(int32_t *input, int32_t *output)
 
 void run_minimum(int32_t *input, int32_t *output)
 {
-    AUDIO_PREPROCESSOR_Tensor_14 *tensor14 = (AUDIO_PREPROCESSOR_Tensor_14 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 14);
     AUDIO_PREPROCESSOR_Tensor_39 *tensor39 = (AUDIO_PREPROCESSOR_Tensor_39 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 39);
+    AUDIO_PREPROCESSOR_Tensor_14 *tensor14 = (AUDIO_PREPROCESSOR_Tensor_14 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 14);
+    AUDIO_PREPROCESSOR_Tensor_40 *tensor40 = (AUDIO_PREPROCESSOR_Tensor_40 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 40);
 
     MinimumParams minimum_params;
     minimum_params.input1_data = input;
+    minimum_params.input1_shape = tensor39->shape;
+    minimum_params.input1_shape_size = sizeof(tensor39->shape) / sizeof(tensor39->shape[0]);
     minimum_params.input2_data = tensor14->data;
+    minimum_params.input2_shape = tensor14->shape;
+    minimum_params.input2_shape_size = sizeof(tensor14->shape) / sizeof(tensor14->shape[0]);
     minimum_params.output_data = output;
+    minimum_params.output_shape = tensor40->shape;
+    minimum_params.output_shape_size = sizeof(tensor40->shape) / sizeof(tensor40->shape[0]);
     minimum_params.flat_size = flatSize(
         sizeof(tensor39->shape) / sizeof(tensor39->shape[0]),
         tensor39->shape);
@@ -493,13 +541,20 @@ void run_minimum(int32_t *input, int32_t *output)
 
 void run_maximum(int32_t *input, int32_t *output)
 {
-    AUDIO_PREPROCESSOR_Tensor_16 *tensor16 = (AUDIO_PREPROCESSOR_Tensor_16 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 16);
     AUDIO_PREPROCESSOR_Tensor_40 *tensor40 = (AUDIO_PREPROCESSOR_Tensor_40 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 40);
+    AUDIO_PREPROCESSOR_Tensor_16 *tensor16 = (AUDIO_PREPROCESSOR_Tensor_16 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 16);
+    AUDIO_PREPROCESSOR_Tensor_41 *tensor41 = (AUDIO_PREPROCESSOR_Tensor_41 *)AUDIO_PREPROCESSOR_get_tensor(&audio_preprocessor_model->tensors, 41);
 
     MaximumParams maximum_params;
     maximum_params.input1_data = input;
+    maximum_params.input1_shape = tensor40->shape;
+    maximum_params.input1_shape_size = sizeof(tensor40->shape) / sizeof(tensor40->shape[0]);
     maximum_params.input2_data = tensor16->data;
+    maximum_params.input2_shape = tensor16->shape;
+    maximum_params.input2_shape_size = sizeof(tensor16->shape) / sizeof(tensor16->shape[0]);
     maximum_params.output_data = output;
+    maximum_params.output_shape = tensor41->shape;
+    maximum_params.output_shape_size = sizeof(tensor41->shape) / sizeof(tensor41->shape[0]);
     maximum_params.flat_size = flatSize(
         sizeof(tensor40->shape) / sizeof(tensor40->shape[0]),
         tensor40->shape);
@@ -515,7 +570,7 @@ void print_bytes(void *ptr, int size)
     {
         for (int j = 0; j < 4; j++)
         {
-            printf("%p " BYTE_TO_BINARY_PATTERN " ", &p[i * 4 + j], BYTE_TO_BINARY(p[i * 4 + j]));
+            printf("%p " BYTE_TO_BINARY_PATTERN " (%x) ", &p[i * 4 + j], BYTE_TO_BINARY(p[i * 4 + j]), p[i * 4 + j]);
         }
         printf("\n");
     }

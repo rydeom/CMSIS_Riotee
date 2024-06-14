@@ -15,6 +15,7 @@
                 "${config:rioteeSdkRoot}/external/CMSIS-DSP/Include"
             ],
             "defines": [
+                "FIXED_POINT=16",
                 "mcpu=cortex-m4",
                 "NRF${config:nrfDevNum}_XXAA",
                 "BSP_DEFINES_ONLY",

@@ -114,7 +114,13 @@
         "signal_energy.h": "c",
         "signal_filter_bank.h": "c",
         "signal_pcan.h": "c",
-        "signal_filter_bank_log.h": "c"
+        "signal_filter_bank_log.h": "c",
+        "concatenation.h": "c",
+        "cast.h": "c",
+        "string.h": "c",
+        "div.h": "c",
+        "signal_filter_bank_spectral_subtraction.h": "c",
+        "minimum_maximum.h": "c"
     },
     "editor.formatOnSave": true,
     "cortex-debug.variableUseNaturalFormat": true

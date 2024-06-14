@@ -1,5 +1,6 @@
 #include "signal_filter_bank.h"
 #include <string.h>
+#include "printf.h"
 
 void FilterbankAccumulateChannels(const SignalFilterBankParams *params,
                                   const uint32_t *input,

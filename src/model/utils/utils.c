@@ -4,6 +4,19 @@
 #include <limits.h>
 #include <math.h>
 #include "audio_preprocessor_operators.h"
+#include "printf.h"
+#include <string.h>
+
+void ExtendShape(const int32_t *input_shape, int32_t input_shape_size, int32_t *extended_shape, int32_t extended_shape_size)
+{
+    int32_t size_increase = extended_shape_size - input_shape_size;
+    for (int i = 0; i < extended_shape_size; ++i)
+    {
+        extended_shape[i] = 1;
+    }
+
+    memcpy(extended_shape + size_increase, input_shape, input_shape_size * sizeof(int32_t));
+}
 
 int32_t flatSize(int32_t dims, int32_t *dims_data)
 {
@@ -113,7 +126,7 @@ void CalculateActivationRange(ActivationFunctionType activation,
                               int32_t *act_min,
                               int32_t *act_max)
 {
-    if (activation == NONE)
+    if (activation == RELU)
     {
         *act_min = 0;
         *act_max = INT32_MAX;

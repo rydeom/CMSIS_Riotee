@@ -2,10 +2,11 @@
 #define CONCATENATION_H
 
 #include <stdint.h>
+#include "printf.h"
 
 typedef struct ConcatenationParams
 {
-    int32_t *input;
+    const int32_t *input;
     int32_t *output;
     int32_t **input_shapes;
     int32_t *output_shape;
