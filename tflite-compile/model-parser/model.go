@@ -84,6 +84,8 @@ const (
 )
 
 type QuantizationParameters struct {
+	Min                 []float32
+	Max                 []float32
 	Scale               []float32
 	Zero_point          []int64
 	Quantized_dimension int32
@@ -125,6 +127,7 @@ const (
 	BuiltinOperator_FULLY_CONNECTED   BuiltinOperator = 9
 	BuiltinOperator_STRIDED_SLICE     BuiltinOperator = 45
 	BuiltinOperator_RESHAPE           BuiltinOperator = 22
+	BuiltinOperator_SOFTMAX           BuiltinOperator = 25
 	BuiltinOperator_CUSTOM            BuiltinOperator = 32
 )
 
@@ -140,6 +143,7 @@ type BuiltinOptions struct {
 	Fully_connected  FullyConnectedOptions
 	Conv_2d          Conv2DOptions
 	Depthwise_conv2d DepthwiseConv2DOptions
+	Softmax          SoftmaxOptions
 	// CUSTOM SIGNAL
 	Signal_window                           SignalWindowOptions
 	Signal_fft_auto_scale                   SignalFftAutoScaleOptions
@@ -233,9 +237,11 @@ type SignalFilterBankLogOptions struct {
 }
 
 type FullyConnectedOptions struct {
-	Fused_activation_function ActivationFunctionType
-	Quantized_bias_type       TensorType
-	Weights_format            FullyConnectedOptionsWeightsFormat
+	Fused_activation_function  ActivationFunctionType
+	Quantized_bias_type        TensorType
+	Weights_format             FullyConnectedOptionsWeightsFormat
+	Keep_num_dims              bool
+	Asymmetric_quantize_inputs bool
 }
 
 type Conv2DOptions struct {
@@ -256,6 +262,10 @@ type DepthwiseConv2DOptions struct {
 	Fused_activation_function ActivationFunctionType
 	Dilation_w_factor         int32
 	Dilation_h_factor         int32
+}
+
+type SoftmaxOptions struct {
+	Beta float32
 }
 
 type ActivationFunctionType byte // enum

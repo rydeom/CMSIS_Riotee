@@ -120,7 +120,12 @@
         "string.h": "c",
         "div.h": "c",
         "signal_filter_bank_spectral_subtraction.h": "c",
-        "minimum_maximum.h": "c"
+        "minimum_maximum.h": "c",
+        "_kiss_fft_guts.h": "c",
+        "depthwise_conv.h": "c",
+        "yes_1000ms_audio_data.h": "c",
+        "micro_model_settings.h": "c",
+        "riotee_thresholds.h": "c"
     },
     "editor.formatOnSave": true,
     "cortex-debug.variableUseNaturalFormat": true

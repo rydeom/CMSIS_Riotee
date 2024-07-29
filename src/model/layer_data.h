@@ -52,4 +52,16 @@ typedef union LayersPuts
     int8_t layer_21_output[40];
 } LayersPuts;
 
+typedef union MicroSpeechLayer
+{
+    int8_t layer_1_input[1960];
+    int8_t layer_1_output[49][40];
+    int8_t layer_2_input[49][40];
+    int8_t layer_2_output[25][20][8];
+    int8_t layer_3_input[25][20][8];
+    int8_t layer_3_output[4];
+    int8_t layer_4_input[4];
+    int8_t layer_4_output[4];
+} MicroSpeechLayer;
+
 #endif // LAYER_DATA_H

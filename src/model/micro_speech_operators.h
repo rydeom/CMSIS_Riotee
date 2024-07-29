@@ -18,6 +18,7 @@ typedef struct {
     int32_t outputs[1];
     BuiltinOperator opcode;
     char pad[2];
+    DepthwiseConv2DOptions builtin_options;
 } __attribute__((__packed__)) MICRO_SPEECH_Operator_1;
 
 typedef struct {
@@ -25,6 +26,7 @@ typedef struct {
     int32_t outputs[1];
     BuiltinOperator opcode;
     char pad[2];
+    FullyConnectedOptions builtin_options;
 } __attribute__((__packed__)) MICRO_SPEECH_Operator_2;
 
 typedef struct {
@@ -32,6 +34,7 @@ typedef struct {
     int32_t outputs[1];
     BuiltinOperator opcode;
     char pad[2];
+    SoftmaxOptions builtin_options;
 } __attribute__((__packed__)) MICRO_SPEECH_Operator_3;
 
 typedef struct {

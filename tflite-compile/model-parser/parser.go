@@ -66,6 +66,18 @@ func (m *Model) parseTensors(sub_graph tflite.SubGraph) {
 			}
 			tflite_quantization := tflite.QuantizationParameters{}
 			tflite_tensor.Quantization(&tflite_quantization)
+			if tflite_quantization.MinLength() > 0 {
+				tensor.Quantization.Min = make([]float32, tflite_quantization.MinLength())
+				for j := 0; j < tflite_quantization.MinLength(); j++ {
+					tensor.Quantization.Min[j] = float32(tflite_quantization.Min(j))
+				}
+			}
+			if tflite_quantization.MaxLength() > 0 {
+				tensor.Quantization.Max = make([]float32, tflite_quantization.MaxLength())
+				for j := 0; j < tflite_quantization.MaxLength(); j++ {
+					tensor.Quantization.Max[j] = float32(tflite_quantization.Max(j))
+				}
+			}
 			if tflite_quantization.ScaleLength() > 0 {
 				tensor.Quantization.Scale = make([]float32, tflite_quantization.ScaleLength())
 				for j := 0; j < tflite_quantization.ScaleLength(); j++ {
@@ -103,7 +115,7 @@ func (m *Model) parseOperators(tflite_model *tflite.Model, sub_graph tflite.SubG
 
 			tflite_model_operator_code := tflite.OperatorCode{}
 			tflite_model.OperatorCodes(&tflite_model_operator_code, int(tflite_operator.OpcodeIndex()))
-			operator.Opcode = BuiltinOperator(tflite_model_operator_code.BuiltinCode())
+			operator.Opcode = BuiltinOperator(tflite_model_operator_code.DeprecatedBuiltinCode())
 			if operator.Opcode == BuiltinOperator_CUSTOM {
 				operator.Custom_opcode = CustomOperator(tflite_model_operator_code.CustomCode())
 			}
@@ -153,6 +165,32 @@ func parseOperatorOptions(operator *Operator, tflite_operator tflite.Operator) {
 		operator.Builtin_options = BuiltinOptions{
 			Concatenation: ConcatenationOptions{
 				Axis: int8(options.Axis()),
+			},
+		}
+	case BuiltinOperator_DEPTHWISE_CONV_2D:
+		table := flatbuffers.Table{}
+		tflite_operator.BuiltinOptions(&table)
+		options := tflite.DepthwiseConv2DOptions{}
+		options.Init(table.Bytes, table.Pos)
+		operator.Builtin_options = BuiltinOptions{
+			Depthwise_conv2d: DepthwiseConv2DOptions{
+				Padding:                   Padding(options.Padding()),
+				Stride_w:                  int32(options.StrideW()),
+				Stride_h:                  int32(options.StrideH()),
+				Depth_multiplier:          int32(options.DepthMultiplier()),
+				Dilation_w_factor:         int32(options.DilationWFactor()),
+				Dilation_h_factor:         int32(options.DilationHFactor()),
+				Fused_activation_function: ActivationFunctionType(options.FusedActivationFunction()),
+			},
+		}
+	case BuiltinOperator_SOFTMAX:
+		table := flatbuffers.Table{}
+		tflite_operator.BuiltinOptions(&table)
+		options := tflite.SoftmaxOptions{}
+		options.Init(table.Bytes, table.Pos)
+		operator.Builtin_options = BuiltinOptions{
+			Softmax: SoftmaxOptions{
+				Beta: options.Beta(),
 			},
 		}
 	}

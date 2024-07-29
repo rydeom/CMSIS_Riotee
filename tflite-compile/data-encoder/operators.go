@@ -50,6 +50,9 @@ func encodeOperatorIntoBytes(operator modelparser.Operator) []byte {
 	if operator.Opcode == modelparser.BuiltinOperator_CONCATENATION {
 		ret = append(ret, encodeConcatenationOptions(operator.Builtin_options.Concatenation)...)
 	}
+	if operator.Opcode == modelparser.BuiltinOperator_SOFTMAX {
+		ret = append(ret, encodeSoftmaxOptions(operator.Builtin_options.Softmax)...)
+	}
 	if opCode == signalCustomOperator(modelparser.CustomOperator_SIGNAL_WINDOW) {
 		ret = append(ret, encodeSignalWindowOptions(operator.Builtin_options.Signal_window)...)
 	}
@@ -150,6 +153,14 @@ func encodeFullyConnectedOptions(options modelparser.FullyConnectedOptions) []by
 	ret = append(ret, byte(options.Quantized_bias_type))
 	ret = append(ret, byte(options.Weights_format))
 	ret = append(ret, byte(0)) // Padding
+	return ret
+}
+
+func encodeSoftmaxOptions(options modelparser.SoftmaxOptions) []byte {
+	ret := []byte{}
+	bufferStride := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bufferStride, uint32(options.Beta))
+	ret = append(ret, bufferStride...)
 	return ret
 }
 

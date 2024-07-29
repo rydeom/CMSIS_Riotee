@@ -67,7 +67,6 @@ func builtinOperatorToEnum() string {
 	h_code += "    SIGNAL_FILTER_BANK_SPECTRAL_SUBTRACTION = 1029,\n"
 	h_code += "    SIGNAL_PCAN = 1030,\n"
 	h_code += "    SIGNAL_FILTER_BANK_LOG = 1031,\n"
-
 	h_code += "} BuiltinOperator;\n"
 	h_code += "\n"
 
@@ -93,6 +92,8 @@ func operatorToStruct(modelTag string, operator *modelparser.Operator, i int) st
 		h_code += "    StridedSliceOptions builtin_options;\n"
 	case modelparser.BuiltinOperator_CONCATENATION:
 		h_code += "    ConcatenationOptions builtin_options;\n"
+	case modelparser.BuiltinOperator_SOFTMAX:
+		h_code += "    SoftmaxOptions builtin_options;\n"
 	}
 
 	if operator.Opcode == modelparser.BuiltinOperator_CUSTOM {

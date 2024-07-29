@@ -3,10 +3,11 @@
 #include "arm_nn_types.h"
 #include "audio_preprocessor_operators.h"
 #include "utils.h"
+#include "printf.h"
 
 void fill_dims(cmsis_nn_dims *input_dims, cmsis_nn_dims *filter_dims, cmsis_nn_dims *bias_dims, cmsis_nn_dims *output_dims, int32_t *weights, int32_t weights_size, int32_t *output, int32_t output_size)
 {
-    int32_t batches = flatSizeSkipDim(weights_size, weights, 0);
+    int32_t batches = flatSizeSkipDim(output_size, output, output_size - 1);
     int32_t accum_depth = weights[weights_size - 1];
     int32_t output_depth = output[output_size - 1];
 
@@ -43,4 +44,3 @@ void fill_quant_params(cmsis_nn_per_tensor_quant_params *quant_params, float inp
 {
     quantizeMultiplier(&quant_params->multiplier, &quant_params->shift, input_scale, weights_scale, output_scale);
 }
-

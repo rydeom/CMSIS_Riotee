@@ -170,4 +170,9 @@ typedef struct
     int32_t dilation_h_factor;
 } __attribute__((__packed__)) DepthwiseConv2DOptions;
 
+typedef struct
+{
+    float beta;
+} __attribute__((__packed__)) SoftmaxOptions;
+
 #endif // OPERATOR_H

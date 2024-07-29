@@ -23,6 +23,54 @@
 #include "add.h"
 #include "div.h"
 #include "minimum_maximum.h"
+#include "depthwise_conv.h"
+#include "fully_connected_utils.h"
+#include "softmax.h"
+#include "micro_model_settings.h"
+
+const AUDIO_PREPROCESSOR_model *audio_preprocessor_model = ((AUDIO_PREPROCESSOR_model *)audio_preprocessor_model_data_raw);
+const MICRO_SPEECH_model *mirco_speech_model = ((MICRO_SPEECH_model *)micro_speech_model_data_raw);
+
+union LayersPuts first_layer = {0};
+union LayersPuts second_layer = {0};
+union MircoSpeechModelData model_data = {0};
+
+uint8_t Classify(ClassificationResult *result, const int16_t *audio_data, const size_t audio_data_size)
+{
+    run_audio_preprocessor(audio_data, audio_data_size);
+    run_model();
+
+    return 0;
+}
+
+void run_audio_preprocessor(const int16_t *audio_data, const size_t audio_data_size)
+{
+    size_t remaining_samples = audio_data_size;
+    size_t feature_index = 0;
+
+    while (remaining_samples >= kAudioSampleDurationCount && feature_index < kFeatureCount)
+    {
+        memcpy(first_layer.layer_0_input, audio_data, kAudioSampleDurationCount * sizeof(int16_t));
+        run_frame(&first_layer, &second_layer);
+        memcpy(model_data.layer_data.layer_1.layer_1_input + (feature_index * kFeatureSize), second_layer.layer_21_output, kFeatureSize * sizeof(int8_t));
+
+        feature_index++;
+        audio_data += kAudioSampleStrideCount;
+        remaining_samples -= kAudioSampleStrideCount;
+    }
+}
+
+void run_model()
+{
+    run_depthwise_conv(&model_data.layer_data.layer_1, &model_data.layer_data.layer_2);
+    run_fully_connected(&model_data.layer_data.layer_2, &model_data.layer_data.layer_1);
+    run_softmax(&model_data.layer_data.layer_1, &model_data.layer_data.layer_2);
+
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%d: %d\n", i, model_data.layer_data.layer_2.layer_4_output[i]);
+    }
+}
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)         \
@@ -35,24 +83,121 @@
         ((byte) & 0x02 ? '1' : '0'), \
         ((byte) & 0x01 ? '1' : '0')
 
-const AUDIO_PREPROCESSOR_model *audio_preprocessor_model = ((AUDIO_PREPROCESSOR_model *)audio_preprocessor_model_data_raw);
-const MICRO_SPEECH_model *mirco_speech_model = ((MICRO_SPEECH_model *)micro_speech_model_data_raw);
-
-riotee_rc_t run_model(const int16_t *audio_data, const size_t audio_data_size)
+void run_depthwise_conv(union MicroSpeechLayer *input_layer, union MicroSpeechLayer *output_layer)
 {
-    union LayersPuts first_layer = {0};
-    union LayersPuts second_layer = {0};
-    printf("First layer start\n");
-    const int16_t g_yes_30ms_audio_data[480] = {-876, -470, 510, 803, 170, -787, -1568, -1893, -1598, -1027, -992, -1803, -2610, -2484, -1905, -2113, -3113, -3399, -2267, -1261, -2007, -3637, -3909, -2340, -893, -1158, -2272, -2486, -1639, -915, -777, -596, -91, 196, 85, 210, 875, 1373, 1247, 1219, 1958, 2718, 2328, 1196, 1008, 2350, 3677, 3269, 1503, 366, 922, 2264, 2810, 1996, 608, -168, 75, 680, 811, 395, -56, -318, -607, -966, -1108, -925, -613, -368, -369, -919, -1926, -2460, -1685, -300, 155, -611, -1524, -2204, -3227, -3859, -2037, 1622, 2382, -2583, -8448, -7544, -84, 4814, 915, -6423, -7558, -1746, 2515, -59, -4587, -3858, 1260, 3625, 187, -4148, -3500, 1542, 5467, 4780, 1256, -1127, -403, 2481, 5332, 6346, 5014, 2536, 1216, 2467, 5039, 6238, 5070, 3381, 3269, 4173, 3905, 2248, 1586, 3299, 5240, 4362, 1004, -1382, -489, 2113, 3168, 1620, -742, -1824, -1435, -897, -1058, -1500, -1545, -1398, -1965, -3266, -4136, -3756, -2609, -1804, -1986, -3087, -4599, -5296, -4051, -1731, -781, -2228, -4092, -3977, -2325, -1353, -1568, -1490, -428, 178, -672, -1650, -1058, 749, 2039, 2079, 1540, 897, 310, 572, 2266, 4265, 4265, 1869, -231, 559, 3332, 4752, 3229, 768, 101, 1364, 2463, 1984, 819, 411, 723, 675, -162, -923, -743, -32, 185, -516, -1653, -2359, -2103, -986, 42, -205, -1702, -2870, -2337, -809, -221, -982, -1544, -946, -598, -2117, -4291, -4100, -857, 1948, 338, -4799, -7972, -5403, 173, 2371, -1063, -5533, -5578, -1777, 605, -985, -3249, -2213, 1184, 2691, 560, -2356, -2288, 1233, 5244, 6441, 4004, 370, -663, 2555, 7404, 9282, 6573, 2612, 1836, 4662, 7467, 7393, 5421, 4262, 4741, 5362, 4705, 3163, 2397, 3337, 4887, 4810, 2254, -749, -1316, 772, 2706, 2016, -573, -2552, -2746, -2012, -1647, -1978, -2579, -3105, -3473, -3911, -4484, -4891, -4795, -4163, -3543, -3538, -4275, -5356, -5743, -4637, -2614, -1301, -1825, -3341, -4011, -2937, -751, 1007, 1245, 235, -639, -61, 1626, 2864, 2967, 2734, 3013, 3329, 2914, 2312, 2666, 3839, 4308, 3162, 1453, 768, 1255, 1887, 2006, 1715, 1031, -297, -1660, -1690, -277, 813, -30, -2137, -3370, -2854, -1553, -593, -413, -1146, -2567, -3440, -2369, -205, 379, -1258, -2315, -812, 262, -3205, -8576, -7894, 738, 7492, 1951, -11595, -17098, -6934, 7139, 8065, -4575, -14199, -8946, 3606, 7504, -547, -8242, -5113, 4406, 8113, 2134, -5040, -4089, 4157, 10934, 10158, 4167, -565, -192, 4428, 9765, 12201, 9861, 4512, 1225, 3451, 8483, 10133, 6497, 2574, 3333, 6806, 6986, 2487, -1214, 623, 5416, 6647, 2204, -3289, -4556, -1565, 1544, 1525, -1236, -4293, -5695, -5174, -3995, -3403, -3449, -3750, -4505, -6014, -7296, -6523, -3849, -2096, -3288, -5722, -6004, -3581, -1497, -1960, -3330, -2800, -434, 964, -111, -1739, -1136, 1736, 4151, 3736, 1274, -451, 469, 3386, 5833, 5898, 3646, 1085, 272, 1743, 4061, 5108, 3837, 1490, 246, 967, 1866, 859, -1069, -974, 1542, 2835, 47, -4285, -5068, -1567, 1781, 1223, -1997, -4227, -3747, -1720, 41, 245, -1228, -2972, -2673, 22, 1980, -930, -7721, -11271, -5725, 4974, 8484, -2007, -16979, -19255, -4670, 11057, 9690, -6417, -17537, -10841, 4262, 9292};
+    MICRO_SPEECH_Operator_1 *op1 = (MICRO_SPEECH_Operator_1 *)MICRO_SPEECH_get_operator(&mirco_speech_model->operators, 1);
+    MICRO_SPEECH_Tensor_4 *tensor4 = (MICRO_SPEECH_Tensor_4 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 4);
+    MICRO_SPEECH_Tensor_8 *tensor8 = (MICRO_SPEECH_Tensor_8 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 8);
+    MICRO_SPEECH_Tensor_0 *tensor0 = (MICRO_SPEECH_Tensor_0 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 0);
+    MICRO_SPEECH_Tensor_2 *tensor2 = (MICRO_SPEECH_Tensor_2 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 2);
 
-    for (int i = 0; i < 480; i++)
-    {
-        first_layer.layer_0_input[i] = g_yes_30ms_audio_data[i];
-    }
-    run_frame(&first_layer, &second_layer);
+    DepthwiseConvParams depthwise_conv_params;
+    depthwise_conv_params.input_data = input_layer->layer_1_input;
+    depthwise_conv_params.input_dims = tensor4->shape;
+    depthwise_conv_params.input_scale = tensor4->quantization.scale;
+    depthwise_conv_params.input_zero_point = tensor4->quantization.zero_point;
 
-    printf("First layer done\n");
-    return RIOTEE_SUCCESS;
+    depthwise_conv_params.filter_data = tensor8->data;
+    depthwise_conv_params.filter_dims = tensor8->shape;
+    depthwise_conv_params.filter_scale = tensor8->quantization.scale;
+    depthwise_conv_params.filter_zero_point = tensor8->quantization.zero_point;
+
+    depthwise_conv_params.biases_data = tensor0->data;
+    depthwise_conv_params.biases_dims = tensor0->shape;
+    depthwise_conv_params.biases_scale = tensor0->quantization.scale;
+    depthwise_conv_params.biases_zero_point = tensor0->quantization.zero_point;
+
+    depthwise_conv_params.output_data = output_layer->layer_2_output;
+    depthwise_conv_params.output_dims = tensor2->shape;
+    depthwise_conv_params.output_scale = tensor2->quantization.scale;
+    depthwise_conv_params.output_zero_point = tensor2->quantization.zero_point;
+
+    depthwise_conv_params.padding = op1->builtin_options.padding;
+    depthwise_conv_params.stride_h = op1->builtin_options.stride_h;
+    depthwise_conv_params.stride_w = op1->builtin_options.stride_w;
+    depthwise_conv_params.dilation_h_factor = op1->builtin_options.dilation_h_factor;
+    depthwise_conv_params.dilation_w_factor = op1->builtin_options.dilation_w_factor;
+    depthwise_conv_params.depth_multiplier = op1->builtin_options.depth_multiplier;
+    depthwise_conv_params.fused_activation_function = op1->builtin_options.fused_activation_function;
+
+    DepthwiseConv(depthwise_conv_params);
+}
+
+void run_fully_connected(union MicroSpeechLayer *input_layer, union MicroSpeechLayer *output_layer)
+{
+    MICRO_SPEECH_Operator_2 *op2 = (MICRO_SPEECH_Operator_2 *)MICRO_SPEECH_get_operator(&mirco_speech_model->operators, 2);
+    MICRO_SPEECH_Tensor_2 *input_node = (MICRO_SPEECH_Tensor_2 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 2);
+    MICRO_SPEECH_Tensor_7 *weights = (MICRO_SPEECH_Tensor_7 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 7);
+    MICRO_SPEECH_Tensor_1 *bias = (MICRO_SPEECH_Tensor_1 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 1);
+    MICRO_SPEECH_Tensor_6 *output = (MICRO_SPEECH_Tensor_6 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 6);
+
+    cmsis_nn_context ctx;
+    ctx.buf = NULL;
+    ctx.size = 0;
+
+    cmsis_nn_fc_params fc_params;
+    fill_fc_params(
+        &fc_params,
+        op2->builtin_options.fused_activation_function,
+        input_node->type,
+        input_node->quantization.zero_point[0],
+        input_node->quantization.scale[0],
+        output->quantization.zero_point[0]);
+
+    cmsis_nn_per_tensor_quant_params quant_params;
+    fill_quant_params(
+        &quant_params,
+        input_node->quantization.scale[0],
+        weights->quantization.scale[0],
+        output->quantization.scale[0]);
+    printf("Quant params: %d %d\n",
+           quant_params.multiplier,
+           quant_params.shift);
+
+    cmsis_nn_dims input_dims;
+    cmsis_nn_dims filter_dims;
+    cmsis_nn_dims bias_dims;
+    cmsis_nn_dims output_dims;
+    fill_dims(
+        &input_dims,
+        &filter_dims,
+        &bias_dims,
+        &output_dims,
+        weights->shape,
+        sizeof(weights->shape) / sizeof(weights->shape[0]),
+        output->shape,
+        sizeof(output->shape) / sizeof(output->shape[0]));
+
+    arm_cmsis_nn_status status = arm_fully_connected_s8(
+        &ctx,
+        &fc_params,
+        &quant_params,
+        &input_dims,
+        input_layer->layer_3_input,
+        &filter_dims,
+        (int8_t *)weights->data,
+        &bias_dims,
+        (int32_t *)bias->data,
+        &output_dims,
+        output_layer->layer_3_output);
+}
+
+void run_softmax(union MicroSpeechLayer *input_layer, union MicroSpeechLayer *output_layer)
+{
+    MICRO_SPEECH_Operator_3 *op3 = (MICRO_SPEECH_Operator_3 *)MICRO_SPEECH_get_operator(&mirco_speech_model->operators, 3);
+    MICRO_SPEECH_Tensor_6 *tensor_6 = (MICRO_SPEECH_Tensor_6 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 6);
+    MICRO_SPEECH_Tensor_9 *tensor_9 = (MICRO_SPEECH_Tensor_9 *)MICRO_SPEECH_get_tensor(&mirco_speech_model->tensors, 9);
+
+    SoftmaxParams softmax_params;
+    softmax_params.input = input_layer->layer_4_input;
+    softmax_params.input_shape = tensor_6->shape;
+    softmax_params.input_shape_size = sizeof(tensor_6->shape) / sizeof(tensor_6->shape[0]);
+    softmax_params.input_scale = tensor_6->quantization.scale[0];
+    softmax_params.output = output_layer->layer_4_output;
+    softmax_params.output_shape = tensor_9->shape;
+    softmax_params.beta = op3->builtin_options.beta;
+
+    softmax(softmax_params);
 }
 
 void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
@@ -131,58 +276,6 @@ void run_frame(union LayersPuts *input_layer, union LayersPuts *output_layer)
         input_layer->layer_21_input,
         output_layer->layer_21_output,
         sizeof(input_layer->layer_21_input) / sizeof(input_layer->layer_21_input[0]));
-
-    printf("Output layer: \n");
-    int8_t expected_feature[40] = {
-        124,
-        105,
-        126,
-        103,
-        125,
-        101,
-        123,
-        100,
-        116,
-        98,
-        115,
-        97,
-        113,
-        90,
-        91,
-        82,
-        104,
-        96,
-        117,
-        97,
-        121,
-        103,
-        126,
-        101,
-        125,
-        104,
-        126,
-        104,
-        125,
-        101,
-        116,
-        90,
-        81,
-        74,
-        80,
-        71,
-        83,
-        76,
-        82,
-        71,
-    };
-
-    for (int i = 0; i < 10; i++)
-    {
-        printf("(%d = %d) (%d = %d) (%d = %d) (%d = %d)\n", expected_feature[i * 4], output_layer->layer_21_output[i * 4], expected_feature[i * 4 + 1], output_layer->layer_21_output[i * 4 + 1], expected_feature[i * 4 + 2], output_layer->layer_21_output[i * 4 + 2], expected_feature[i * 4 + 3], output_layer->layer_21_output[i * 4 + 3]);
-    }
-    printf("\n");
-
-    printf("Frame done\n");
 }
 
 void run_signal_window(int16_t *input, int32_t input_size, int16_t *output)
@@ -576,65 +669,3 @@ void print_bytes(void *ptr, int size)
     }
     printf("\n");
 }
-
-/*
-arm_cmsis_nn_status execute_layer_1(Model *model,
-                                    union LayersPuts *input_layer,
-                                    union LayersPuts *output_layer)
-{
-    Operator_0 *op1 = (Operator_0 *)get_operator(&model->operators, 0);
-    Tensor_0 *input_node = (Tensor_0 *)get_tensor(&model->tensors, 0);
-    Tensor_6 *weights = (Tensor_6 *)get_tensor(&model->tensors, 6);
-    Tensor_5 *bias = (Tensor_5 *)get_tensor(&model->tensors, 5);
-    Tensor_7 *output = (Tensor_7 *)get_tensor(&model->tensors, 7);
-
-    cmsis_nn_context ctx;
-    ctx.buf = NULL;
-    ctx.size = 0;
-
-    cmsis_nn_fc_params fc_params;
-    fill_fc_params(
-        &fc_params,
-        op1->builtin_options.fused_activation_function,
-        input_node->type,
-        input_node->quantization.zero_point[0],
-        input_node->quantization.scale[0],
-        output->quantization.zero_point[0]);
-
-    cmsis_nn_per_tensor_quant_params quant_params;
-    fill_quant_params(
-        &quant_params,
-        input_node->quantization.scale[0],
-        weights->quantization.scale[0],
-        output->quantization.scale[0]);
-
-    cmsis_nn_dims input_dims;
-    cmsis_nn_dims filter_dims;
-    cmsis_nn_dims bias_dims;
-    cmsis_nn_dims output_dims;
-    fill_dims(
-        &input_dims,
-        &filter_dims,
-        &bias_dims,
-        &output_dims,
-        &weights->shape[0],
-        sizeof(weights->shape) / sizeof(weights->shape[0]),
-        &output->shape[0],
-        sizeof(output->shape) / sizeof(output->shape[0]));
-
-    arm_cmsis_nn_status status = arm_fully_connected_s8(
-        &ctx,
-        &fc_params,
-        &quant_params,
-        &input_dims,
-        input_layer->layer_1_input,
-        &filter_dims,
-        (int8_t *)weights->data,
-        &bias_dims,
-        (int32_t *)bias->data,
-        &output_dims,
-        output_layer->layer_1_output);
-
-    return status;
-}
-*/
