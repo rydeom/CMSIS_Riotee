@@ -8,19 +8,33 @@ import (
 )
 
 func main() {
-	filePath := "hello_world_int8.tflite"
-	buffer, err := os.ReadFile(filePath)
+	audioPreprocessorModel, err := loadAndParseModel("tflite-files/audio_preprocessor_int8.tflite")
 	if err != nil {
-		fmt.Println("Error reading file:", err)
+		fmt.Println("Error reading and parsing model:", err)
 		return
 	}
+	mircoSpeechModel, err := loadAndParseModel("tflite-files/micro_speech_quantized.tflite")
+	if err != nil {
+		fmt.Println("Error reading and parsing model:", err)
+		return
+	}
+	storePath := "/Users/janstiefel/code/Riotee_AppTemplate/src/model"
+
+	modelencoder.Endcode(audioPreprocessorModel, storePath, "AUDIO_PREPROCESSOR")
+	modelencoder.Endcode(mircoSpeechModel, storePath, "MICRO_SPEECH")
+}
+
+func loadAndParseModel(filePath string) (*modelparser.Model, error) {
+	buffer, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading file: %v", err)
+	}
+
 	model := modelparser.Model{}
 	err = model.ParseModel(buffer)
 	if err != nil {
-		fmt.Println("Error parsing model:", err)
-		return
+		return nil, fmt.Errorf("error parsing model: %v", err)
 	}
 
-	modelencoder.Endcode(&model)
-
+	return &model, nil
 }

@@ -5,3 +5,4 @@ process-tflite
 schema
 external/cmsis-nn-build
 external/cmsis-dsp-build
+tflite-compile/tflite-files

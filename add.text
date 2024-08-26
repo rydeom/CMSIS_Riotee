@@ -1,0 +1,16 @@
+input1_shape.DimensionsCount() = 40
+input2_shape.DimensionsCount() = 1
+output_shape.DimensionsCount() = 40
+params.input1_offset = -2147483648
+params.input2_offset = 2147483440
+params.output_offset = 536999512
+params.left_shift = 536995584
+params.input1_multiplier = 17
+params.input1_shift = 536999760
+params.input2_multiplier = 22
+params.input2_shift = 536996188
+params.output_multiplier = 0
+params.output_shift = 0
+params.quantized_activation_min = -2147483648
+params.quantized_activation_max = 2147483647
+params.broadcast_shape[24337, 194791, 536999244, 17, 24289]

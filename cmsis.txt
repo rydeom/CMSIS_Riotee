@@ -1,0 +1,6 @@
+FC params: 128 0 14 -128 127
+Quant params: 1932201080 -11
+Input dims: 4000 1 1 4000
+Filter dims: 4000 1 1 4
+Bias dims: 1 1 1 4
+Output dims: 4000 1 1 4

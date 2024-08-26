@@ -27,15 +27,15 @@ func encodeTensorIntoBytes(tensor *modelparser.Tensor, buffers []modelparser.Buf
 		ret = append(ret, bufferShape...)
 	}
 
-	bufferBuffer := make([]byte, 4)
-	binary.LittleEndian.PutUint32(bufferBuffer, tensor.Buffer)
-	ret = append(ret, bufferBuffer...)
-
 	ret = append(ret, encodeQuantizationParamsIntoBytes(tensor.Quantization)...)
 	buffer := buffers[tensor.Buffer]
 	ret = append(ret, buffer.Data...)
 	if len(ret)%4 != 0 {
-		fmt.Println("Warning: buffer size is not a multiple of 4")
+		ret = append(ret, make([]byte, 4-len(ret)%4)...)
+	}
+
+	if len(ret)%4 != 0 {
+		fmt.Println("Warning: tensor buffer size is not a multiple of 4")
 	}
 
 	return ret

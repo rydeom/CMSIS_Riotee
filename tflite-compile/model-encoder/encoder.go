@@ -3,57 +3,25 @@ package modelencoder
 import (
 	"fmt"
 	"os"
+	"strings"
 	dataencoder "tflite-compile/data-encoder"
 	modelparser "tflite-compile/model-parser"
 )
 
-func Endcode(m *modelparser.Model) error {
-	c_code_t, h_code_t := EncodeTensors(m.Tensors, m.Buffers)
-	c_code_o, h_code_o := EncodeOperators(m.Operators)
-	c_code_m, h_code_m := endcodeModel(m)
-	c_code_u, h_code_u := EncodeUtils()
-	c_code_f, h_code_f := EncodeFullyConnectedUtils()
+func Endcode(m *modelparser.Model, path string, modelTag string) error {
+	c_code_t, h_code_t := EncodeTensors(modelTag, m.Tensors, m.Buffers)
+	c_code_o, h_code_o := EncodeOperators(modelTag, m.Operators)
+	c_code_m, h_code_m := endcodeModel(m, modelTag)
 
-	path := "/Users/janstiefel/code/Riotee_AppTemplate/src/model"
-
-	// os.Mkdir("build", 0755)
-	err := os.WriteFile(path+"/tensor.c", []byte(c_code_t), 0644)
+	err := saveFiles(path, "tensors", modelTag, c_code_t, h_code_t)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(path+"/tensor.h", []byte(h_code_t), 0644)
+	err = saveFiles(path, "operators", modelTag, c_code_o, h_code_o)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(path+"/operator.c", []byte(c_code_o), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/operator.h", []byte(h_code_o), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/model.c", []byte(c_code_m), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/model.h", []byte(h_code_m), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/utils.c", []byte(c_code_u), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/utils.h", []byte(h_code_u), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/fully_connected_utils.c", []byte(c_code_f), 0644)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+"/fully_connected_utils.h", []byte(h_code_f), 0644)
+	err = saveFiles(path, "model", modelTag, c_code_m, h_code_m)
 	if err != nil {
 		return err
 	}
@@ -61,18 +29,33 @@ func Endcode(m *modelparser.Model) error {
 	return nil
 }
 
-func endcodeModel(m *modelparser.Model) (string, string) {
+func saveFiles(path string, fileName string, modelTag string, c_code string, h_code string) error {
+	lowerModelTag := strings.ToLower(modelTag)
+	err := os.WriteFile(path+"/"+lowerModelTag+"_"+fileName+".c", []byte(c_code), 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+"/"+lowerModelTag+"_"+fileName+".h", []byte(h_code), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func endcodeModel(m *modelparser.Model, modelTag string) (string, string) {
+	lowerModelTag := strings.ToLower(modelTag)
+	upperModelTag := strings.ToUpper(modelTag)
+
 	c_code := ""
 	c_code += "#include <stdio.h>\n"
 	c_code += "#include <stdint.h>\n"
-	c_code += "#include \"tensor.h\"\n"
-	c_code += "#include \"operator.h\"\n"
-	c_code += "#include \"model.h\"\n"
-	c_code += "#include \"printf.h\"\n"
+	c_code += AddInclude(lowerModelTag + "_model.h")
+	c_code += AddInclude(lowerModelTag + "_tensors.h")
+	c_code += AddInclude(lowerModelTag + "_operators.h")
 	c_code += "\n"
-	c_code += printModelPointer(m)
 
-	c_code += "__aligned(16) const unsigned char model_data_raw[] = {"
+	c_code += "__aligned(16) const unsigned char " + lowerModelTag + "_model_data_raw[] = {"
 	dataBytes := dataencoder.EncodeModelIntoBytes(m)
 	for i, b := range dataBytes {
 		if i%16 == 0 {
@@ -83,50 +66,27 @@ func endcodeModel(m *modelparser.Model) (string, string) {
 	c_code += "\n};\n"
 
 	h_code := ""
-	h_code += "#ifndef MODEL_H\n"
-	h_code += "#define MODEL_H\n"
+	h_code += "#ifndef " + upperModelTag + "_MODEL_H\n"
+	h_code += "#define " + upperModelTag + "_MODEL_H\n"
 	h_code += "\n"
 	h_code += "#include <stdio.h>\n"
 	h_code += "#include <stdint.h>\n"
-	h_code += "#include \"tensor.h\"\n"
-	h_code += "#include \"operator.h\"\n"
+	h_code += AddInclude(lowerModelTag + "_tensors.h")
+	h_code += AddInclude(lowerModelTag + "_operators.h")
 	h_code += "\n"
 
 	h_code += "typedef struct {\n"
 	h_code += "    uint32_t version;\n"
-	h_code += "    Tensors tensors;\n"
-	h_code += "    Operators operators;\n"
+	h_code += "    " + upperModelTag + "_Tensors tensors;\n"
+	h_code += "    " + upperModelTag + "_Operators operators;\n"
 	h_code += fmt.Sprintf("    int32_t inputs[%d];\n", len(m.Inputs))
 	h_code += fmt.Sprintf("    int32_t outputs[%d];\n", len(m.Outputs))
-	h_code += "} Model;\n"
+	h_code += "} " + upperModelTag + "_model;\n"
 	h_code += "\n"
 
-	h_code += "extern const unsigned char model_data_raw[];"
+	h_code += "extern const unsigned char " + lowerModelTag + "_model_data_raw[];\n"
 	h_code += "\n"
-	h_code += printModelPointerH(m)
-	h_code += "#endif // MODEL_H\n"
+	h_code += "#endif // " + upperModelTag + "_MODEL_H\n"
 
 	return c_code, h_code
-}
-
-func printModelPointer(m *modelparser.Model) string {
-	c_code := ""
-
-	c_code += "void print_model_pointer(Model *model){\n"
-	c_code += "    printf(\"Model: %p\\r\\n\", model);\n"
-	c_code += "    printf(\"Model version: %d\\r\\n\", model->version);\n"
-	c_code += "    printf(\"[%x, %x, %x]\\r\\n\", &model->version, &model->tensors, &model->operators);\n"
-	c_code += "}\n"
-	c_code += "\n"
-
-	return c_code
-}
-
-func printModelPointerH(m *modelparser.Model) string {
-	h_code := ""
-
-	h_code += "void print_model_pointer(Model *model);\n"
-	h_code += "\n"
-
-	return h_code
 }
